@@ -88,6 +88,64 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     
     ## Do the conversion - different method based on data type
     
+    # Define a function where you input an expression, and if the function(s)
+    # in that expression exist, run the expression, if they don't output 
+    # something (given as an argument to the function we are defining)
+    checkExpression <- function(expression, outputIfBad = FALSE) {
+        
+        # Use NSE to get the expression
+        expression_good <- deparse(substitute(expression)) 
+        
+        # Get the location of all of the parentheses
+        parenLocations <- gregexpr("\\(", expression_good)
+        
+        # Function that, given the position in a character vector of length one
+        # of a left parenthese "(", gets the name of the function
+        getFunction <- function(expression, parenPosition) {
+            
+            # Define symbols that are not allowed
+            illegalSymbols <- c(" ", "<", "-", "+", "*", "(", '"', "'",
+                                "^", "&", "!", "@", "#", "$", "%", "/")
+            
+            ## Loop over positions starting just past the left paren position,
+            ## while they aren't in illegalSymbols, keep going
+            
+            currentPosition <- parenPosition - 1
+            currentChar <- substr(expression, currentPosition, currentPosition)
+            
+            while (!(currentChar %in% illegalSymbols)) {
+                
+                currentPosition <- currentPosition - 1
+                currentChar <- substr(expression, currentPosition, 
+                                      currentPosition)
+                if (currentPosition == 1) break
+            }   
+            
+            # Get the current function
+            currentFunction <- substr(expression, currentPosition, 
+                                      (parenPosition - 1))
+            return(currentFunction)
+        }
+        
+        # Loop over parenLocations and get the function names
+        functionNames <- sapply(parenLocations[[1]], function(parenLocation) {
+            return(getFunction(expression_good, parenLocation))
+        })
+        
+        # Check if the function names exist
+        functionExists <- sapply(functionNames, exists)
+        
+        # If all functions exist, return the expression, and if not, return
+        # outputIfBad
+        if (all(functionExists == TRUE)) {
+            return(eval(expression))
+        } else {
+            return(outputIfBad)
+        }
+    }
+    
+    ## //////////
+    
     if (is.data.table(data)) {
         
         ## If data is a data.table ---------------------------------------------
