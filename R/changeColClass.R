@@ -93,11 +93,8 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     # something (given as an argument to the function we are defining)
     checkExpression <- function(expression, outputIfBad = FALSE) {
         
-        # Use NSE to get the expression
-        expression_good <- deparse(substitute(expression)) 
-        
         # Get the location of all of the parentheses
-        parenLocations <- gregexpr("\\(", expression_good)
+        parenLocations <- gregexpr("\\(", expression)
         
         # Function that, given the position in a character vector of length one
         # of a left parenthese "(", gets the name of the function
@@ -122,23 +119,34 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
             }   
             
             # Get the current function
-            currentFunction <- substr(expression, currentPosition, 
+            currentFunction <- substr(expression, (currentPosition + 1), 
                                       (parenPosition - 1))
-            return(currentFunction)
+            
+            if (currentChar %in% illegalSymbols) {
+                return(invisible())
+            } else {
+                return(currentFunction)  
+            }
         }
         
         # Loop over parenLocations and get the function names
         functionNames <- sapply(parenLocations[[1]], function(parenLocation) {
-            return(getFunction(expression_good, parenLocation))
+            return(getFunction(expression, parenLocation))
+            currentFunction <- getFunction(expression, parenLocation)
+            if (!is.null(currentFunction)) return(currentFunction)
         })
+        
+        print(functionNames)
         
         # Check if the function names exist
         functionExists <- sapply(functionNames, exists)
         
+        print(functionExists)
+        
         # If all functions exist, return the expression, and if not, return
         # outputIfBad
         if (all(functionExists == TRUE)) {
-            return(eval(expression))
+            return(eval(parse(text = expression)))
         } else {
             return(outputIfBad)
         }
