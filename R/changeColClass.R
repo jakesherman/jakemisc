@@ -95,6 +95,8 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
         
         # Get the location of all of the parentheses
         parenLocations <- gregexpr("\\(", expression)
+        parenLocations <- sapply(parenLocations[[1]], print)
+        print(parenLocations)
         
         # Function that, given the position in a character vector of length one
         # of a left parenthese "(", gets the name of the function
@@ -102,7 +104,7 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
             
             # Define symbols that are not allowed
             illegalSymbols <- c(" ", "<", "-", "+", "*", "(", '"', "'",
-                                "^", "&", "!", "@", "#", "$", "%", "/")
+                                "^", "&", "!", "@", "#", "$", "%", "/", "")
             
             ## Loop over positions starting just past the left paren position,
             ## while they aren't in illegalSymbols, keep going
@@ -122,18 +124,16 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
             currentFunction <- substr(expression, (currentPosition + 1), 
                                       (parenPosition - 1))
             
-            if (currentChar %in% illegalSymbols) {
-                return(invisible())
+            if (currentFunction %in% illegalSymbols) {
+                
             } else {
                 return(currentFunction)  
             }
         }
         
         # Loop over parenLocations and get the function names
-        functionNames <- sapply(parenLocations[[1]], function(parenLocation) {
+        functionNames <- sapply(parenLocations, function(parenLocation) {
             return(getFunction(expression, parenLocation))
-            currentFunction <- getFunction(expression, parenLocation)
-            if (!is.null(currentFunction)) return(currentFunction)
         })
         
         print(functionNames)
