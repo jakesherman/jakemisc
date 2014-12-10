@@ -74,3 +74,24 @@ jake <- test[sapply(test, function(f) {
 
 class(as.data.frame)
 class(graphics::Axis)
+
+# test function
+
+z <- 15  # defined in global env
+test <- function(x) {
+    
+    y <- 20  # defined in test's env
+    print("current environment")
+    print(environment())
+    print(sys.frame())
+    print(ls())
+    
+    cat("\n next environment \n")
+    print(sys.frame(-1))
+    print(ls(envir = sys.frame(-1)))
+    return(x+y)
+}
+
+test(10)
+as.data.frame <- 10
+

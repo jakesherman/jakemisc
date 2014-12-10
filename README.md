@@ -19,7 +19,7 @@ devtools::install_github("jakesherman/jakemisc")
 - `matchup`: a quick way to match two variables with a 1:1 relationship, in the same way that VLOOKUP or INDEX/MATCH from Excel allow for matches between variables with a 1:1 relationship.
 - `packages`: installs or loads and then installs one or more R packages from CRAN, Github, or Bitbucket. Users have the option of not installing packages that one does not have, or being prompted to install packages via pacakges' arguments.
 - `valuesToNA`: given a data.frame or data.table, converts one or more values into NAs. Allows you to specify specific columns for conversion to take place over.
-- `valuesToNA`: given a data.frame or data.table, converts one or more values into a different value. Allows you to specify specific columns for conversion to take place over.
+- `valuesToValue`: given a data.frame or data.table, converts one or more values into a different value. Allows you to specify specific columns for conversion to take place over.
 
 ### A note on the *changeColClass*, *changeColName*, *valuesToNA*, and *valuesToValue* functions:
 
