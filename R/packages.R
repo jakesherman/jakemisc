@@ -86,8 +86,8 @@ packages <- function(..., install = TRUE, results = FALSE,
     # session, set install to FALSE, and return a warning
     if (install == "prompt" & !(interactive())) {
         install <- FALSE
-        warning(paste0("install was set to prompt in a non-interactive session",
-                       " , therefore install was set to FALSE"))
+        warning(paste0("install was set to 'prompt' in a non-interactive sessi",
+                       "on , therefore install was set to FALSE"))
     }
         
     # results must be TRUE or FALSE
@@ -118,12 +118,6 @@ packages <- function(..., install = TRUE, results = FALSE,
         })
         
         return(package_names)
-    }
-    
-    # Get vector of names of all installed packages
-    installedPackages <- function() {
-        all_packages <- installed.packages()
-        return(all_packages[1:(length(all_packages)/16)])
     }
     
     # Given a string a symbol, return the position of the symbol w/i the string
@@ -368,7 +362,7 @@ packages <- function(..., install = TRUE, results = FALSE,
     # package names, create the results table, get the loop sequence, and of
     # course turn ... into a vector of package names
     package_names <- returnPackageNames(...)
-    all_packages <- installedPackages()
+    all_packages <- installedPackages()  # now an internal package function
     results_table <- list(loaded = NULL, installed_but_not_loaded = NULL,
                           newly_installed = NULL, failure = NULL)
     loopSequence <- getLoopSequence(order)
@@ -409,8 +403,10 @@ packages <- function(..., install = TRUE, results = FALSE,
             # Modify the install variable based on user input
             if (command == "y") {
                 install <- TRUE
+                
             } else if (command == "n") {
                 install <- FALSE
+                
             } else {
                 stop("You inputted something other than [y/n] in the prompt")
             }

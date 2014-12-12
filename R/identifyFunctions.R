@@ -4,19 +4,13 @@
 ## (ex. "is.data.table(my_variable"), and outputs the names of all funtions
 ## contained in the expression string.
 ##
+## rename to findFunctions or locateFunctions, these are more suiting names
+##
 ## =============================================================================
 
 identifyFunctions <- function(expression, output = NULL) {
     
     ## Define functions --------------------------------------------------------
-    
-    # Function for getting a numerical vector of the positions of a character
-    # within a string (using regex, from the grepexpr function)
-    getCharacterPositions <- function(string, pattern, ignore.case = FALSE) {
-        charPositions <- gregexpr(pattern, string, ignore.case)
-        charPositions <- charPositions[[1]][1:length(charPositions[[1]])]
-        return(charPositions)
-    }
     
     # Function that, given the position in a character vector of length one
     # of a left parenthese "(", gets the name of the function
@@ -63,13 +57,13 @@ identifyFunctions <- function(expression, output = NULL) {
             # If length(colonPositions) == 1, it's a sequence and we don't want
             # the :, it length is 2 or 3 it's good, if it's 4 or more it's back
             # to being bad!
-            colonPositions <- getCharacterPositions(currentFunction, "\\:")
+            colonPositions <- patternPositions(currentFunction, "\\:")
             if (length(colonPositions) == 1) {
                 currentFunction <- substr(currentFunction, (colonPositions + 1),
                                           (nchar(currentFunction)))
             } else if (length(colonPositions) > 3) {
                 firstColonPosition <- colonPositions[length(colonPositions)]
-                currentFunction <- substr(currentFunction, (firstColonPosition + 1), 
+                currentFunction <- substr(currentFunction,(firstColonPosition+1), 
                            (nchar(currentFunction)))
             }
         }
@@ -81,15 +75,14 @@ identifyFunctions <- function(expression, output = NULL) {
     ## Identify functions within the expression argument -----------------------
     
     # Get parenthesis locations
-    parenLocations <- getCharacterPositions(expression, "\\(")
+    parenPositions <- patternPositions(expression, "\\(")
     
-    # Loop over parenLocations and get the function names
+    # Loop over parenPositions and get the function names
     functionNames <- NULL
-    if (length(parenLocations) != 0) {
+    if (length(parenPositions) != 0) {
         
-        for (i in seq_along(parenLocations)) {
-            
-            currentParenLocation <- parenLocations[i]
+        for (i in seq_along(parenPositions)) {
+            currentParenLocation <- parenPositions[i]
             currentFunction <- getFunction(expression, currentParenLocation)
             if (!is.null(currentFunction)) {
                 functionNames <- append(functionNames, currentFunction)
