@@ -118,8 +118,8 @@ whereFunction <- function(functionName, output = "environment",
         if (exists(functionInfo[["functionName"]], envir = package_env,
                    mode = "function")) {
             # Success
-            logicalOutput <<- c(logicalOutput, TRUE)
-            listOutput <<- c(listOutput, env)
+            logicalOutput <- c(logicalOutput, TRUE)
+            listOutput <- c(listOutput, env)
             
         } else {
             # Failure
