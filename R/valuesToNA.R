@@ -18,6 +18,11 @@
 #' @param data a data frame/table that we want to remove NAs from
 #' @param values a vector of one or more values that you wish to be converted
 #' into NAs
+#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
+#' the data.table by reference (modifying-in-place), if FALSE, do not modify
+#' the data.table by reference, instead treat it like a data.frame (copy on
+#' modify). When combining this function with the magrittr package, use the
+#' %T>% operator before this function to modify-in-place.
 #' @param onlyConvert optional - specify a vector of one or more column names
 #' as the only columns where the NA conversion will take place. You may either
 #' have this parameter satified, or the noConvert parameter specified, you may
@@ -37,19 +42,14 @@
 #' columnn in my_data except for "town", "city", or "country":
 #' valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))
 
-valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL, 
-                       noConvert = NULL) {
+valuesToNA <- function(data = NULL, values = NULL, ref = TRUE, 
+                       onlyConvert = NULL, noConvert = NULL) {
     
     ## Error handling ----------------------------------------------------------
     
     # Missing arguments
     if (is.null(data)) stop("Please enter the data argument")
-    if (is.null(values)) stop("Requires argument for values")
-    
-    # If data isn't a data.table or data.frame, get outta here
-    if (!(is.data.frame(data) | is.data.table(data))) {
-        stop("The data argument must be a data frame/table")
-    }
+    if (is.null(values)) stop("Please enter the values argument")
     
     ## Get a vector of valid columns names, col_names --------------------------
     
@@ -60,8 +60,8 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
     if (!is.null(onlyConvert) & !is.null(noConvert)) {
         
         # If both onlyConvert and noConvert are specified, stop the function
-        stop(paste0("Only one of the two optional arguments onlyConvert and ",
-                    "noConvert may be specified at the same time."))
+        stop("Only one of the two optional arguments onlyConvert and ",
+             "noConvert may be specified at the same time.")
         
     } else if (!is.null(onlyConvert)) {
         
@@ -74,12 +74,12 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
         col_names <- col_names[!col_names %in% noConvert]
     }
     
-    # If col_names is empty aka character(0), stop the function
+    # If col_names is empty (aka character(0)), stop the function
     if (length(col_names) == 0) {
-        stop(paste0("No valid columns from data selected. Make sure that ",
-                    "data is a valid data.frame/data.table, and that your ",
-                    "onlyConvert or noConvert inputs dont results in no ",
-                    "columns being selected"))
+        stop("No valid columns from data selected. Make sure that ",
+             "data is a valid data.frame/data.table, and that your ",
+             "onlyConvert or noConvert inputs dont results in no ",
+             "columns being selected")
     }
     
     # Use NSE to get the name of the data argument
@@ -87,7 +87,22 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
     
     ## Do the conversion - different method based on data type
     
-    if (is.data.table(data)) {
+    if (ref == FALSE) {
+        
+        ## If ref is set to FALSE from its default of TRUE ---------------------
+        
+        # Turn data into a data.table...
+        if ("data.table" %in% class(data)) data <- as.data.frame(data)
+        
+        # ...and use base R data.frame subsetting
+        data[col_names] <- lapply(data[col_names], function(f) {
+            f[which(f %in% values)] <- NA
+            return(f)
+        }) 
+        
+        return(data) 
+        
+    } else if ("data.table" %in% class(data)) {
         
         ## If data is a data.table ---------------------------------------------
         
@@ -96,21 +111,24 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
             set(data, which(data[[col_name]] %in% c(values)), col_name, NA) 
         } 
         
+        # Warn the user that modification by reference occured
+        warning("Because your data argument was a data.table and the ref ",
+                "argument was TRUE, your data.table was modified by reference.",
+                " If this is not your intended function behavior, set ref to",
+                " FALSE.")
+        
+        return(invisible())
+        
     } else {
         
         ## If data is a data.frame --------------------------------------------- 
         
         # Remove values from col_names
         data[col_names] <- lapply(data[col_names], function(f) {
-            f[which(f %in% c(col_names))] <- NA
+            f[which(f %in% values)] <- NA
             return(f)
         })
         
-        # Modify in place (but copying the data frame) data
-        command <- paste0(data_name, " <<- data")
-        eval_this <- parse(text = command)
-        eval(eval_this) 
+        return(data) 
     }
-    
-    return(invisible())
 }
