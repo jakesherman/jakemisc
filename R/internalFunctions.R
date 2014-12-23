@@ -20,3 +20,8 @@ installedPackages <- function() {
     all_packages <- installed.packages()
     return(all_packages[1:(length(all_packages)/16)])
 }
+
+# Is a package installed?
+isPackageInstalled <- function(packageName) {
+    return(packageName %in% installedPackages())
+}

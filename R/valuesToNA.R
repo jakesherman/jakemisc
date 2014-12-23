@@ -3,26 +3,18 @@
 #' Given a data.frame or data.table, turns selected values into NAs for 
 #' specified columns. By default all columns are used, but you may specify the
 #' onlyConvert argument with a vector of one or more columns names and only do
-#' the NA conversion on these columns, or alternatively, specify the noConvert
+#' the NA conversion on these columns, or, alternatively, specify the noConvert
 #' argument with a vector of one or more columns names that shouldnt have the
 #' conversion done on them. You may only choose to specify onlyConvert or 
 #' noConvert, you may not specify both at the same time. 
 #' 
-#' Note that this function has side effects, namely, it modifies
-#' an object in its calling environment. This was necessary for data.tables, as
-#' the goal is to modify them in place. I decided to do the same for data
-#' frames to make the function syntax the same, even though R wont do 
-#' modification in place for data frames. 
+#' By default, modification by reference will occur for data.tables. To turn
+#' this off, set ref to FALSE. By default warnings is set to TRUE.
 #' 
 #' @keywords valuesToNA, NA
 #' @param data a data frame/table that we want to remove NAs from
 #' @param values a vector of one or more values that you wish to be converted
 #' into NAs
-#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
-#' the data.table by reference (modifying-in-place), if FALSE, do not modify
-#' the data.table by reference, instead treat it like a data.frame (copy on
-#' modify). When combining this function with the magrittr package, use the
-#' %T>% operator before this function to modify-in-place.
 #' @param onlyConvert optional - specify a vector of one or more column names
 #' as the only columns where the NA conversion will take place. You may either
 #' have this parameter satified, or the noConvert parameter specified, you may
@@ -31,19 +23,29 @@
 #' that you do not want any NA conversion applied to. You may either have this 
 #' parameter satified, or the noConvert parameter specified, you may not 
 #' specify both.
+#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
+#' the data.table by reference (modifying-in-place), if FALSE, do not modify
+#' the data.table by reference, instead treat it like a data.frame (copy on
+#' modify). When combining this function with the magrittr package, use the
+#' %T>% operator before this function to modify-in-place.
+#' @param warnings TRUE (default) or FALSE, should warnings occur when 
+#' modifications by reference occur or conversions take place?
 #' @export
 #' @examples
 #' 
 #' Lets say we want to convert "na" or -500 values into NAs for only the
-#' columns "town" and "city" in my_data:
+#' columns "town" and "city" in the data.table my_data:
 #' valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
+#' 
+#' Here is the same as above, but for a data.frame my_data:
+#' my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
 #' 
 #' Or, what if we want to convert "na" or -500 values into NAs for every
 #' columnn in my_data except for "town", "city", or "country":
 #' valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))
 
-valuesToNA <- function(data = NULL, values = NULL, ref = TRUE, 
-                       onlyConvert = NULL, noConvert = NULL) {
+valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL, 
+                       noConvert = NULL, ref = TRUE, warnings = TRUE) {
     
     ## Error handling ----------------------------------------------------------
     
@@ -91,18 +93,35 @@ valuesToNA <- function(data = NULL, values = NULL, ref = TRUE,
         
         ## If ref is set to FALSE from its default of TRUE ---------------------
         
-        # Turn data into a data.table...
-        if ("data.table" %in% class(data)) data <- as.data.frame(data)
+        # If data is a data.table, create an explicit copy of data, do the 
+        # conversion by reference on that copy, then return the copy. If data
+        # is not a data.table (though it should be, otherwise there is no good
+        # reason to set ref to FALSE) do data.frame conversion.
+        if ("data.table" %in% class(data) & isPackageInstalled("data.table")) {
+            
+            # Make a copy of data
+            data <- copy(data)
+            
+            # Remove values from col_names
+            for (col_name in col_names) {
+                set(data, which(data[[col_name]] %in% c(values)), col_name, NA) 
+            } 
+            
+            return(data)
+            
+        } else {
+            
+            # Remove values from col_names
+            data[col_names] <- lapply(data[col_names], function(f) {
+                f[which(f %in% values)] <- NA
+                return(f)
+            })
+            
+            return(data) 
+        }
         
-        # ...and use base R data.frame subsetting
-        data[col_names] <- lapply(data[col_names], function(f) {
-            f[which(f %in% values)] <- NA
-            return(f)
-        }) 
-        
-        return(data) 
-        
-    } else if ("data.table" %in% class(data)) {
+    } else if ("data.table" %in% class(data) & 
+                   isPackageInstalled("data.table")) {
         
         ## If data is a data.table ---------------------------------------------
         
@@ -112,12 +131,11 @@ valuesToNA <- function(data = NULL, values = NULL, ref = TRUE,
         } 
         
         # Warn the user that modification by reference occured
-        warning("Because your data argument was a data.table and the ref ",
-                "argument was TRUE, your data.table was modified by reference.",
-                " If this is not your intended function behavior, set ref to",
-                " FALSE.")
+        if (warnings) {
+            warning("Data modified by reference b/c data is a data.table.")
+        }
         
-        return(invisible())
+        # Not returning anything - should invisible() be returned?
         
     } else {
         
@@ -131,4 +149,44 @@ valuesToNA <- function(data = NULL, values = NULL, ref = TRUE,
         
         return(data) 
     }
+}
+
+## Tests - one set of tests if you have data.table
+
+# Test 1 - if data.table is installed ///////////////////////////
+if (require(data.table)) {
+    
+    library(datasets)
+    mtcars <- data.table(mtcars)
+    mtcars2 <- copy(mtcars)
+    mtcars3 <- copy(mtcars)
+    mtcars3 <- as.data.frame(mtcars)
+    
+    # mtcars is a data.table, do modification by reference. mtcars2 is the same
+    # data.table by don't do modification by reference. mtcars3 is a data.frame.
+    # Then, check to see if they are all identical.
+    valuesToNA(mtcars, c(6,4))
+    mtcars2 <- valuesToNA(mtcars2, c(6,4), ref = FALSE)
+    mtcars3 <- valuesToNA(mtcars3, c(6,4))
+    mtcars3 <- data.table(mtcars3)
+    
+    identical(mtcars, mtcars2)
+    identical(mtcars, mtcars3)
+    identical(mtcars2, mtcars3)  
+}
+
+# Test 2 /////////////////////////////////////////////////////
+
+library(datasets)
+mtcars <- valuesToNA(mtcars, c(6,4))
+
+# See if any 6s or 4s exist in mtcars
+mtcars_false <- sapply(mtcars, function(f) {
+    all(c(6,4) %in% f)
+})
+
+if(any(mtcars_false)) {
+    print("failure")
+} else {
+    print("success")
 }
