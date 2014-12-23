@@ -42,3 +42,17 @@ NSEtoVector <- function(..., USE.NAMES = FALSE) {
     
     return(package_names)
 }
+
+# Given a string a symbol, return the position of the symbol w/i the string
+getSymbolPosition <- function(string, symbol) {
+    return(gregexpr(symbol, string)[[1]][1])
+}
+
+# Seperate a character vector of length 1 based on an inputted symbol
+seperateSymbol <- function(string, symbol) {
+    symbolPosition <- getSymbolPosition(string, symbol)
+    before_symbol <- substr(string, 1, (symbolPosition - 1))
+    after_symbol <- substr(string, (symbolPosition + 1), 
+                   nchar(string))
+    return(c(before_symbol, after_symbol))
+}
