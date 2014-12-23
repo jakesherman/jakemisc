@@ -1,0 +1,173 @@
+#' changeColOrder()
+#'
+#' Changes a column name from one to another. Accepts both data frames and 
+#' data.tables. 
+#' 
+#' Note that this function has side effects, namely, it modifies
+#' an object in its calling environment. This was necessary for data.tables, as
+#' the goal is to modify them in place. I decided to do the same for data
+#' frames to make the function syntax the same, even though R won't do 
+#' modification in place for data frames. 
+#' 
+#' @keywords matchup, match, up, lookup, crosswalk
+#' @param data a data.frame or data.table 
+#' @param ... either a) if you are only changing one column, the current column
+#' name, followed by a comma and then the desired column name (option of NSE), 
+#' or b) one or more of the following: current_column_name/desired_column_name,
+#' where the current column name is followed by a forward slash followed by
+#' your desired column name. Using the function in this way, you may change
+#' as many column names as you like in one function call.
+#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
+#' the data.table by reference (modifying-in-place), if FALSE, do not modify
+#' the data.table by reference, instead treat it like a data.frame (copy on
+#' modify). When combining this function with the magrittr package, use the
+#' \code{\%T>\%} operator before this function to modify-in-place.
+#' @param warnings TRUE (default) or FALSE, should warnings occur when 
+#' modifications by reference occur or conversions take place?
+#' @export
+#' @examples
+#' 
+#' Here is how to change a column name, where we change a column named "Jake"
+#' into one named "Josh":
+#' 
+#' changeColOrder(my_data, "Jake", "Josh")
+
+changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
+    
+    ## Get all of the column name changes we are doing -------------------------
+    
+    # Use NSE to turn ... into a character vector
+    order_changes <- NSEtoVector(...)
+    order_changes_list <- list()
+    
+    # If length of ... is 2 and no > or < is present, treat it as one order 
+    # change (left), otherwise we have one or more order changes via > and <
+    if (length(order_changes) == 2 & !all(grepl(">", order_changes)) &
+            !all(grepl("<", order_changes))) {
+        
+        order_changes_list[[1]] <- c(order_changes[1], order_changes[2])
+        
+    } else {
+        
+        # Seperate into previous and future orders using > and <
+        order_changes <- order_changes[grepl(">", order_changes)]
+        order_changes_list <- lapply(order_changes, seperateSymbol, "<")
+    }
+    
+    ## Error handling ----------------------------------------------------------
+    
+    # If arguments are missing
+    if (is.null(data)) stop("Requires argument for data")
+    
+    ## Get a vector of new column names ----------------------------------------
+    
+    # Functions for changing column orders
+    newColOrders <- function(col_names, left_of, this_col, 
+                              direction = "left") {
+        
+        # Get column orders for the given column names, get the position of 
+        # left_col and this_col within the given column names
+        col_orders <- seq_along(col_names)
+        left_of_pos <- match(left_of, col_names)
+        this_col_pos <- match(this_col, col_names)
+        
+        # Get the positions to the left and right of this_col
+        left_this <- col_orders[col_orders < this_col_pos]
+        right_this <- col_orders[col_orders > this_col_pos]
+        
+        # Take left_of_pos out of left_this
+        if (!is.null(left_this)) {
+            if (left_of_pos %in% left_this) {
+                left_this <- left_this[!left_this %in% left_of_pos]
+            }
+        }
+        
+        # Take left_of_pos out of right_this
+        if (!is.null(right_this)) {
+            if (left_of_pos %in% right_this) {
+                right_this <- right_this[!right_this %in% left_of_pos]
+            }
+        }
+        
+        # Return the new column order
+        if (direction == "left") {
+            newOrder <- c(left_this, left_of_pos, this_col_pos, right_this)
+        } else {
+            newOrder <- c(left_this, this_col_pos, left_of_pos, right_this)
+        }
+        
+        return(newOrder)
+    }
+    
+    # Get an updated character vector of column names based on the inputted 
+    # column name changes
+    col_names <- names(data)
+    col_order <- NULL
+    for (i in seq_along(order_changes_list)) {
+        
+        ## Get the first and second columns, and if it's a left arrow ----------
+        
+        first_col <- order_changes_list[[i]][1]
+        second_col <- order_changes_list[[i]][2]
+        isLeftArrow <- grepl(">", order_changes[i])
+        
+        ## Error handling for each case --------------------
+        
+        # If current_colname isn't actually a column in data
+        if (!(first_col %in% names(data)) | !(second_col %in% names(data))) {
+            stop("One or more of your inputted columns are not good column ",
+                 "names")
+        }
+        
+        ## Update col_names ----------------
+        if (isLeftArrow) {
+            col_order <- newColOrders(col_names, first_col, second_col, "left")
+            col_names <- col_names[col_order]
+        } else {
+            col_order <- newColOrders(col_names, first_col, second_col, "right")
+            col_names <- col_names[col_order]
+        }
+    }
+    
+    ## Do the column name changing ---------------------------------------------
+    
+    # Change the column names(varies if we have a data.table or
+    # a data.frame)]
+    if (ref == FALSE) {
+        
+        ## If ref is set to FALSE from its default of TRUE ---------------------
+        
+        # If data is a data.table, create an explicit copy of data, do the 
+        # conversion by reference on that copy, then return the copy. If data
+        # is not a data.table (though it should be, otherwise there is no good
+        # reason to set ref to FALSE) do data.frame conversion.
+        if ("data.table" %in% class(data) & isPackageInstalled("data.table")) {
+            
+            # Make a copy of data, change the names using setnames() to avoid
+            # warnings from data.table
+            data <- copy(data)
+            setnames(data, names(data), col_names)
+            return(data)
+            
+        } else {
+            
+            names(data) <- col_names
+            return(data)
+        }
+        
+    } else if ("data.table" %in% class(data) & 
+                   isPackageInstalled("data.table")) {
+        
+        ## If data is a data.table ---------------------------------------------
+        
+        setnames(data, names(data), col_names)
+        return(invisible())
+        
+    } else {
+        
+        ## If data is a data.frame --------------------------------------------- 
+        
+        names(data) <- col_names
+        return(data)
+    }
+}
