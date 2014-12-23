@@ -4,7 +4,7 @@
 \title{valuesToValue()}
 \usage{
 valuesToValue(data = NULL, values = NULL, valueToConvertTo = NULL,
-  onlyConvert = NULL, noConvert = NULL)
+  ref = TRUE, onlyConvert = NULL, noConvert = NULL)
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
@@ -13,6 +13,12 @@ valuesToValue(data = NULL, values = NULL, valueToConvertTo = NULL,
 into another value}
 
 \item{valueToConvertTo}{the value that you want values converted to}
+
+\item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
+the data.table by reference (modifying-in-place), if FALSE, do not modify
+the data.table by reference, instead treat it like a data.frame (copy on
+modify). When combining this function with the magrittr package, use the
+\%T>\% operator before this function to modify-in-place.}
 
 \item{onlyConvert}{optional - specify a vector of one or more column names
 as the only columns where the NA conversion will take place. You may either

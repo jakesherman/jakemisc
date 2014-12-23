@@ -25,3 +25,20 @@ installedPackages <- function() {
 isPackageInstalled <- function(packageName) {
     return(packageName %in% installedPackages())
 }
+
+# Turn one or more NSE names (...) into a character vector, removing " marks
+NSEtoVector <- function(..., USE.NAMES = FALSE) {
+    
+    # Concatenate the package names together via non-standard evaluation
+    # (NSE) so quotes do not need to be placed around package names
+    package_names <- sapply(substitute(...()), deparse)
+    
+    # Remove escaped quotation marks if the the user inputted any package 
+    # names in quotation marks:
+    package_names <- sapply(package_names, function(f) {
+        if (grepl("\"", f)) f <- gsub("\"", "", f)
+        return(f)
+    }, USE.NAMES = USE.NAMES)
+    
+    return(package_names)
+}

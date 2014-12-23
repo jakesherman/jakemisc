@@ -25,7 +25,7 @@ specify both.}
 }
 \description{
 Changes the class of columns from one class to another class, ex. change all
-columns of class 'factor' into columns of class 'character.' Works on both
+columns of class factor into columns of class character. Works on both
 data.frames and data.tables. You may also specify either a) specific columns
 to do this conversion on, or alternatively b) specific columns that you do not
 want converted.

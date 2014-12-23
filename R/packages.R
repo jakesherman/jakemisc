@@ -103,23 +103,6 @@ packages <- function(..., install = TRUE, results = FALSE,
     
     ## Define functions --------------------------------------------------------
     
-    # Given the ... argument, returns a vector of clean package names
-    returnPackageNames <- function(...) {
-        
-        # Concatenate the package names together via non-standard evaluation
-        # (NSE) so quotes do not need to be placed around package names
-        package_names <- sapply(substitute(...()), deparse)
-        
-        # Remove escaped quotation marks if the the user inputted any package 
-        # names in quotation marks:
-        package_names <- sapply(package_names, function(f) {
-            if (grepl("\"", f)) f <- gsub("\"", "", f)
-            return(f)
-        })
-        
-        return(package_names)
-    }
-    
     # Given a string a symbol, return the position of the symbol w/i the string
     getSymbolPosition <- function(string, symbol) {
         return(gregexpr(symbol, string)[[1]][1])
@@ -361,7 +344,7 @@ packages <- function(..., install = TRUE, results = FALSE,
     # Create parameters of interest before initializing the loop - get all 
     # package names, create the results table, get the loop sequence, and of
     # course turn ... into a vector of package names
-    package_names <- returnPackageNames(...)
+    package_names <- NSEtoVector(...)
     all_packages <- installedPackages()  # now an internal package function
     results_table <- list(loaded = NULL, installed_but_not_loaded = NULL,
                           newly_installed = NULL, failure = NULL)

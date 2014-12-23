@@ -4,7 +4,7 @@
 \title{valuesToNA()}
 \usage{
 valuesToNA(data = NULL, values = NULL, onlyConvert = NULL,
-  noConvert = NULL)
+  noConvert = NULL, ref = TRUE, warnings = TRUE)
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
@@ -21,27 +21,36 @@ not specify both.}
 that you do not want any NA conversion applied to. You may either have this
 parameter satified, or the noConvert parameter specified, you may not
 specify both.}
+
+\item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
+the data.table by reference (modifying-in-place), if FALSE, do not modify
+the data.table by reference, instead treat it like a data.frame (copy on
+modify). When combining this function with the magrittr package, use the
+\%T>\% operator before this function to modify-in-place.}
+
+\item{warnings}{TRUE (default) or FALSE, should warnings occur when
+modifications by reference occur or conversions take place?}
 }
 \description{
 Given a data.frame or data.table, turns selected values into NAs for
 specified columns. By default all columns are used, but you may specify the
 onlyConvert argument with a vector of one or more columns names and only do
-the NA conversion on these columns, or alternatively, specify the noConvert
+the NA conversion on these columns, or, alternatively, specify the noConvert
 argument with a vector of one or more columns names that shouldnt have the
 conversion done on them. You may only choose to specify onlyConvert or
 noConvert, you may not specify both at the same time.
 }
 \details{
-Note that this function has side effects, namely, it modifies
-an object in its calling environment. This was necessary for data.tables, as
-the goal is to modify them in place. I decided to do the same for data
-frames to make the function syntax the same, even though R wont do
-modification in place for data frames.
+By default, modification by reference will occur for data.tables. To turn
+this off, set ref to FALSE. By default warnings is set to TRUE.
 }
 \examples{
 Lets say we want to convert "na" or -500 values into NAs for only the
-columns "town" and "city" in my_data:
+columns "town" and "city" in the data.table my_data:
 valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
+
+Here is the same as above, but for a data.frame my_data:
+my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
 
 Or, what if we want to convert "na" or -500 values into NAs for every
 columnn in my_data except for "town", "city", or "country":

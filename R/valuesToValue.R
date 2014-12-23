@@ -8,22 +8,14 @@
 #' conversion done on them. You may only choose to specify onlyConvert or 
 #' noConvert, you may not specify both at the same time. 
 #' 
-#' Note that this function has side effects, namely, it modifies
-#' an object in its calling environment. This was necessary for data.tables, as
-#' the goal is to modify them in place. I decided to do the same for data
-#' frames to make the function syntax the same, even though R wont do 
-#' modification in place for data frames. 
+#' By default, modification by reference will occur for data.tables. To turn 
+#' this off, set ref to FALSE. By default warnings is set to TRUE.
 #' 
-#' @keywords valuesToValue
+#' @keywords valuesToValue, change, value, values
 #' @param data a data frame/table that we want to remove NAs from
 #' @param values a vector of one or more values that you wish to be converted
 #' into another value
 #' @param valueToConvertTo the value that you want values converted to
-#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
-#' the data.table by reference (modifying-in-place), if FALSE, do not modify
-#' the data.table by reference, instead treat it like a data.frame (copy on
-#' modify). When combining this function with the magrittr package, use the
-#' %T>% operator before this function to modify-in-place.
 #' @param onlyConvert optional - specify a vector of one or more column names
 #' as the only columns where the NA conversion will take place. You may either
 #' have this parameter satified, or the noConvert parameter specified, you may
@@ -32,6 +24,13 @@
 #' that you do not want any NA conversion applied to. You may either have this 
 #' parameter satified, or the noConvert parameter specified, you may not 
 #' specify both.
+#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
+#' the data.table by reference (modifying-in-place), if FALSE, do not modify
+#' the data.table by reference, instead treat it like a data.frame (copy on
+#' modify). When combining this function with the magrittr package, use the
+#' \code{\%T>\%} operator before this function to modify-in-place.
+#' @param warnings TRUE (default) or FALSE, should warnings occur when 
+#' modifications by reference occur or conversions take place?
 #' @export
 #' @examples
 #' 
@@ -44,20 +43,17 @@
 #' valuesToNA(my_data, c("na", -500), "jake", noConvert = c("town", "city", 
 #' "country"))
 
-valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL, 
-                          ref = TRUE, onlyConvert = NULL, noConvert = NULL) {
+valuesToNA <- function(data = NULL, values = NULL, valueToConvertTo = NULL, 
+                       onlyConvert = NULL, noConvert = NULL, ref = TRUE, 
+                       warnings = TRUE) {
     
     ## Error handling ----------------------------------------------------------
     
     # Missing arguments
     if (is.null(data)) stop("Please enter the data argument")
-    if (is.null(values)) stop("Requires argument for values")
-    if (is.null(valueToConvertTo)) stop("Requires argument for valueToConvertTo")
-
-    # If value isn't a vector of length 1, throw an error
-    if (length(valueToConvertTo) != 1 | !is.atomic(valueToConvertTo)) {
-        stop("valueToConvertTo must be an atomic vector of length 1")
-    }
+    if (is.null(values)) stop("Please enter the values argument")
+    if (is.null(valueToConvertTo)) stop("Please enter the valueToConvertTo ",
+                                        "argument")
     
     ## Get a vector of valid columns names, col_names --------------------------
     
@@ -82,7 +78,7 @@ valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL,
         col_names <- col_names[!col_names %in% noConvert]
     }
     
-    # If col_names is empty aka character(0), stop the function
+    # If col_names is empty (aka character(0)), stop the function
     if (length(col_names) == 0) {
         stop("No valid columns from data selected. Make sure that ",
              "data is a valid data.frame/data.table, and that your ",
@@ -99,29 +95,49 @@ valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL,
         
         ## If ref is set to FALSE from its default of TRUE ---------------------
         
-        # Replace values from col_names
-        data[col_names] <- lapply(data[col_names], function(f) {
-            f[which(f %in% c(col_names))] <- valueToConvertTo
-            return(f)
-        })
+        # If data is a data.table, create an explicit copy of data, do the 
+        # conversion by reference on that copy, then return the copy. If data
+        # is not a data.table (though it should be, otherwise there is no good
+        # reason to set ref to FALSE) do data.frame conversion.
+        if ("data.table" %in% class(data) & isPackageInstalled("data.table")) {
+            
+            # Make a copy of data
+            data <- copy(data)
+            
+            # Remove values from col_names
+            for (col_name in col_names) {
+                set(data, which(data[[col_name]] %in% c(values)), col_name, 
+                    valueToConvertTo) 
+            } 
+            
+            return(data)
+            
+        } else {
+            
+            # Remove values from col_names
+            data[col_names] <- lapply(data[col_names], function(f) {
+                f[which(f %in% values)] <- valueToConvertTo
+                return(f)
+            })
+            
+            return(data) 
+        }
         
-        return(data) 
-        
-    } else if ("data.table" %in% class(data)) {
+    } else if ("data.table" %in% class(data) & 
+                   isPackageInstalled("data.table")) {
         
         ## If data is a data.table ---------------------------------------------
         
-        # Replace values from col_names
+        # Remove values from col_names
         for (col_name in col_names) {
             set(data, which(data[[col_name]] %in% c(values)), col_name, 
                 valueToConvertTo) 
         } 
         
         # Warn the user that modification by reference occured
-        warning("Because your data argument was a data.table and the ref ",
-                "argument was TRUE, your data.table was modified by reference.",
-                " If this is not your intended function behavior, set ref to",
-                " FALSE.")
+        if (warnings) {
+            warning("Data modified by reference b/c data is a data.table.")
+        }
         
         return(invisible())
         
@@ -129,9 +145,9 @@ valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL,
         
         ## If data is a data.frame --------------------------------------------- 
         
-        # Replace values from col_names
+        # Remove values from col_names
         data[col_names] <- lapply(data[col_names], function(f) {
-            f[which(f %in% c(col_names))] <- valueToConvertTo
+            f[which(f %in% values)] <- valueToConvertTo
             return(f)
         })
         

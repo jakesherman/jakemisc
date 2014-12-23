@@ -8,7 +8,7 @@
 #' conversion done on them. You may only choose to specify onlyConvert or 
 #' noConvert, you may not specify both at the same time. 
 #' 
-#' By default, modification by reference will occur for data.tables. To turn
+#' By default, modification by reference will occur for data.tables. To turn 
 #' this off, set ref to FALSE. By default warnings is set to TRUE.
 #' 
 #' @keywords valuesToNA, NA
@@ -27,7 +27,7 @@
 #' the data.table by reference (modifying-in-place), if FALSE, do not modify
 #' the data.table by reference, instead treat it like a data.frame (copy on
 #' modify). When combining this function with the magrittr package, use the
-#' %T>% operator before this function to modify-in-place.
+#' \code{\%T>\%} operator before this function to modify-in-place.
 #' @param warnings TRUE (default) or FALSE, should warnings occur when 
 #' modifications by reference occur or conversions take place?
 #' @export
@@ -35,14 +35,14 @@
 #' 
 #' Lets say we want to convert "na" or -500 values into NAs for only the
 #' columns "town" and "city" in the data.table my_data:
-#' valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
+#' \code{valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
 #' 
 #' Here is the same as above, but for a data.frame my_data:
-#' my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
+#' \code{my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
 #' 
 #' Or, what if we want to convert "na" or -500 values into NAs for every
 #' columnn in my_data except for "town", "city", or "country":
-#' valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))
+#' \code{valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))}
 
 valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL, 
                        noConvert = NULL, ref = TRUE, warnings = TRUE) {
@@ -135,7 +135,7 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
             warning("Data modified by reference b/c data is a data.table.")
         }
         
-        # Not returning anything - should invisible() be returned?
+        return(invisible())
         
     } else {
         
@@ -149,44 +149,4 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
         
         return(data) 
     }
-}
-
-## Tests - one set of tests if you have data.table
-
-# Test 1 - if data.table is installed ///////////////////////////
-if (require(data.table)) {
-    
-    library(datasets)
-    mtcars <- data.table(mtcars)
-    mtcars2 <- copy(mtcars)
-    mtcars3 <- copy(mtcars)
-    mtcars3 <- as.data.frame(mtcars)
-    
-    # mtcars is a data.table, do modification by reference. mtcars2 is the same
-    # data.table by don't do modification by reference. mtcars3 is a data.frame.
-    # Then, check to see if they are all identical.
-    valuesToNA(mtcars, c(6,4))
-    mtcars2 <- valuesToNA(mtcars2, c(6,4), ref = FALSE)
-    mtcars3 <- valuesToNA(mtcars3, c(6,4))
-    mtcars3 <- data.table(mtcars3)
-    
-    identical(mtcars, mtcars2)
-    identical(mtcars, mtcars3)
-    identical(mtcars2, mtcars3)  
-}
-
-# Test 2 /////////////////////////////////////////////////////
-
-library(datasets)
-mtcars <- valuesToNA(mtcars, c(6,4))
-
-# See if any 6s or 4s exist in mtcars
-mtcars_false <- sapply(mtcars, function(f) {
-    all(c(6,4) %in% f)
-})
-
-if(any(mtcars_false)) {
-    print("failure")
-} else {
-    print("success")
 }
