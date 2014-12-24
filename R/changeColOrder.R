@@ -39,19 +39,27 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
     # Use NSE to turn ... into a character vector
     order_changes <- NSEtoVector(...)
     order_changes_list <- list()
+    lorder_changes_list <- list()
+    rorder_changes_list <- list()
+    lorder_changes <- NULL
+    rorder_changes <- NULL
     
     # If length of ... is 2 and no > or < is present, treat it as one order 
     # change (left), otherwise we have one or more order changes via > and <
-    if (length(order_changes) == 2 & !all(grepl(">", order_changes)) &
-            !all(grepl("<", order_changes))) {
+    if (length(order_changes) == 2 & all(grepl(">", order_changes)) &
+            all(grepl("<", order_changes))) {
         
         order_changes_list[[1]] <- c(order_changes[1], order_changes[2])
         
     } else {
         
         # Seperate into previous and future orders using > and <
-        order_changes <- order_changes[grepl(">", order_changes)]
-        order_changes_list <- lapply(order_changes, seperateSymbol, "<")
+        lorder_changes <- order_changes[grepl(">", order_changes)]
+        rorder_changes <- order_changes[grepl("<", order_changes)]
+        lorder_changes_list <- lapply(lorder_changes, seperateSymbol, ">")
+        rorder_changes_list <- lapply(rorder_changes, seperateSymbol, "<")
+        order_changes_list <- c(lorder_changes_list, rorder_changes_list)
+        order_changes <- c(lorder_changes, rorder_changes)
     }
     
     ## Error handling ----------------------------------------------------------
