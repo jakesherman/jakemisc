@@ -43,7 +43,7 @@
 #' valuesToNA(my_data, c("na", -500), "jake", noConvert = c("town", "city", 
 #' "country"))
 
-valuesToNA <- function(data = NULL, values = NULL, valueToConvertTo = NULL, 
+valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL, 
                        onlyConvert = NULL, noConvert = NULL, ref = TRUE, 
                        warnings = TRUE) {
     
