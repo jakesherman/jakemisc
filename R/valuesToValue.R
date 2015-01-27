@@ -86,9 +86,6 @@ valuesToNA <- function(data = NULL, values = NULL, valueToConvertTo = NULL,
              "columns being selected")
     }
     
-    # Use NSE to get the name of the data argument
-    data_name <- deparse(substitute(data)) 
-    
     ## Do the conversion - different method based on data type
     
     if (ref == FALSE) {
