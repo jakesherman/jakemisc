@@ -86,8 +86,14 @@ valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL,
              "columns being selected")
     }
     
-    # Use NSE to get the name of the data argument
-    data_name <- deparse(substitute(data)) 
+    ## Handle an NA in values --------------------------------------------------
+    
+    NAs <- 0
+    
+    if (sum(is.na(values)) > 0) {
+        NAs <- 1
+        values <- complete.cases(values)
+    }
     
     ## Do the conversion - different method based on data type
     
@@ -145,12 +151,35 @@ valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL,
         
         ## If data is a data.frame --------------------------------------------- 
         
-        # Remove values from col_names
-        data[col_names] <- lapply(data[col_names], function(f) {
-            f[which(f %in% values)] <- valueToConvertTo
-            return(f)
-        })
-        
-        return(data) 
+        if (NAs == 1) {
+            
+            # Remove NAs from col_names
+            data[col_names] <- lapply(data[col_names], function(f) {
+                f[which(is.na(f))] <- valueToConvertTo
+                return(f)
+            })
+            
+            # If there are more values (other than NA), convert those as well
+            if (length(values) > 0) {
+                
+                # Remove values from col_names
+                data[col_names] <- lapply(data[col_names], function(f) {
+                    f[which(f %in% values)] <- valueToConvertTo
+                    return(f)
+                }) 
+            }
+            
+            return(data)
+            
+        } else {
+            
+            # Remove values from col_names
+            data[col_names] <- lapply(data[col_names], function(f) {
+                f[which(f %in% values)] <- valueToConvertTo
+                return(f)
+            })
+            
+            return(data)  
+        }
     }
 }
