@@ -3,8 +3,8 @@
 \alias{valuesToNA}
 \title{valuesToNA()}
 \usage{
-valuesToNA(data = NULL, values = NULL, onlyConvert = NULL,
-  noConvert = NULL, ref = TRUE, warnings = TRUE)
+valuesToNA(data = NULL, values = NULL, valueToConvertTo = NULL,
+  onlyConvert = NULL, noConvert = NULL, ref = TRUE, warnings = TRUE)
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
@@ -26,7 +26,7 @@ specify both.}
 the data.table by reference (modifying-in-place), if FALSE, do not modify
 the data.table by reference, instead treat it like a data.frame (copy on
 modify). When combining this function with the magrittr package, use the
-\%T>\% operator before this function to modify-in-place.}
+\code{\%T>\%} operator before this function to modify-in-place.}
 
 \item{warnings}{TRUE (default) or FALSE, should warnings occur when
 modifications by reference occur or conversions take place?}
@@ -47,14 +47,14 @@ this off, set ref to FALSE. By default warnings is set to TRUE.
 \examples{
 Lets say we want to convert "na" or -500 values into NAs for only the
 columns "town" and "city" in the data.table my_data:
-valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
+\\code{valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
 
 Here is the same as above, but for a data.frame my_data:
-my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
+\\code{my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
 
 Or, what if we want to convert "na" or -500 values into NAs for every
 columnn in my_data except for "town", "city", or "country":
-valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))
+\\code{valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))}
 }
 \keyword{NA}
 \keyword{valuesToNA,}

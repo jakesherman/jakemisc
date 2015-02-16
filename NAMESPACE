@@ -2,9 +2,12 @@
 
 export(changeColClass)
 export(changeColName)
+export(changeColOrder)
+export(createDelimited)
 export(createMatchup)
 export(factorToNumeric)
 export(matchup)
 export(packages)
+export(pipeDT)
 export(valuesToNA)
 export(valuesToValue)

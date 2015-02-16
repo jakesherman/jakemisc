@@ -94,7 +94,7 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
         # conversion by reference on that copy, then return the copy. If data
         # is not a data.table (though it should be, otherwise there is no good
         # reason to set ref to FALSE) do data.frame conversion.
-        if ("data.table" %in% class(data) & isPackageInstalled("data.table")) {
+        if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
             
             # Make a copy of data
             data <- copy(data)
@@ -117,8 +117,7 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
             return(data) 
         }
         
-    } else if ("data.table" %in% class(data) & 
-                   isPackageInstalled("data.table")) {
+    } else if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
         
         ## If data is a data.table ---------------------------------------------
         

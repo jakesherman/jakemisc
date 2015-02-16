@@ -88,7 +88,7 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     
     ## Do the conversion - different method based on data type
     
-    if (is.data.table(data)) {
+    if (inherits(data, "data.table")) {
         
         ## If data is a data.table ---------------------------------------------
         

@@ -6,9 +6,10 @@ Description: A set of misc. functions from Jake Sherman.
 Depends:
     R (>= 3.0.0)
 Imports:
+    data.table,
     devtools,
     fastmatch
 Suggests:
-    data.table
+    dplyr
 License: MIT License
 LazyData: true

@@ -121,7 +121,7 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
         # conversion by reference on that copy, then return the copy. If data
         # is not a data.table (though it should be, otherwise there is no good
         # reason to set ref to FALSE) do data.frame conversion.
-        if ("data.table" %in% class(data) & isPackageInstalled("data.table")) {
+        if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
             
             # Make a copy of data, change the names using setnames() to avoid
             # warnings from data.table
