@@ -8,18 +8,18 @@ pipeDT(table, ..., returnDT = NULL)
 \arguments{
 \item{table}{a data.frame or data.table.}
 
-\item{...}{arguments to be passed to "[.data.table", with the x argument
-to "[.data.table" already being passed by the above table argument.}
+\item{...}{arguments to be passed to [.data.table, with the x argument
+to [.data.table already being passed by the above table argument.}
 
 \item{returnDT}{NULL by default, can set to TRUE or FALSE to explicitly
 return a data.table. By default, a data.table is returned if table is a
 data.table, and a data.frame is returned if table is a data.frame.}
 }
 \description{
-Evaluates "[.data.table" in a magrittr pipe-able expression.
+Evaluates [.data.table in a magrittr pipe-able expression.
 }
 \examples{
-Here's an example of creating a column with dplyr,
+Heres an example of creating a column with dplyr,
 mtcars \%<>\%
    mutate(Jake = cyl + 1) \%T>\%
    pipeDT(Jake := cyl + 1)

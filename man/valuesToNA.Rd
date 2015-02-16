@@ -3,8 +3,8 @@
 \alias{valuesToNA}
 \title{valuesToNA()}
 \usage{
-valuesToNA(data = NULL, values = NULL, valueToConvertTo = NULL,
-  onlyConvert = NULL, noConvert = NULL, ref = TRUE, warnings = TRUE)
+valuesToNA(data = NULL, values = NULL, onlyConvert = NULL,
+  noConvert = NULL, ref = TRUE, warnings = TRUE)
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
