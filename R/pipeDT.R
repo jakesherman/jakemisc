@@ -20,12 +20,15 @@
 pipeDT <- function(table, ..., returnDT = NULL) {
     
     # Load data.table
-    requireNamespace(data.table)
+    library(data.table)
     
     # If table isn't of the data.table class, make it one
     if (!inherits(table, "data.table")) {
         table <- data.table(table)
     }
+    
+    # Set returnDT to 0 if NULL
+    if (is.null(returnDT)) returnDT <- 0
     
     # Return the table
     if (returnDT == TRUE) {

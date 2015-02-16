@@ -22,7 +22,7 @@ createDelimited <- function(table, delimit_this, by_this, delimiter = ", ",
                             filter = NULL, returnDT = NULL) {
     
     # Load data.table - in the Imports section of the package namespace
-    requireNamespace("data.table")
+    library("data.table")
     
     # If table is a data.table, copy it, if not don't
     if (inherits(table, "data.table")) {
@@ -56,6 +56,9 @@ createDelimited <- function(table, delimit_this, by_this, delimiter = ", ",
     # Add correct column names
     myTable[, c(delimit_this) := NULL]
     setnames(myTable, c(by_this, delimit_this))
+    
+    # Set returnDT to 0 if NULL
+    if (is.null(returnDT)) returnDT <- 0
     
     # Return the table
     if (returnDT == TRUE) {
