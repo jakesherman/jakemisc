@@ -18,11 +18,10 @@
 #' data.table, and a data.frame is returned if table is a data.frame.
 #' @export
 
+# Function for delimited tables
 createDelimited <- function(table, delimit_this, by_this, delimiter = ", ",
-                            filter = NULL, returnDT = NULL) {
-    
-    # Load data.table - in the Imports section of the package namespace
-    library("data.table")
+                            filter = NULL, returnDT = NULL,
+                            keepCols = NULL) {
     
     # If table is a data.table, copy it, if not don't
     if (inherits(table, "data.table")) {
@@ -41,7 +40,8 @@ createDelimited <- function(table, delimit_this, by_this, delimiter = ", ",
     }
     
     # Delete all unnecessary columns
-    deleteThese <- tableNames[!tableNames %in% c(delimit_this, by_this)]
+    deleteThese <- tableNames[!tableNames %in% c(delimit_this, by_this, 
+                                                 keepCols)]
     myTable[, c(deleteThese) := NULL]
     
     # Create the delimited field
