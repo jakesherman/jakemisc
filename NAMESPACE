@@ -11,5 +11,3 @@ export(packages)
 export(pipeDT)
 export(valuesToNA)
 export(valuesToValue)
-
-imports(data.table)

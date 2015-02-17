@@ -7,6 +7,10 @@
 ##
 ## =============================================================================
 
+# compatibility for data.table functions
+# (see: https://github.com/hadley/dplyr/issues/548)
+.datatable.aware <- TRUE
+
 # Function for getting a numerical vector of the positions of a pattern
 # within a string (using regex, from the grepexpr function)
 patternPositions <- function(string, pattern, ignore.case = FALSE) {
