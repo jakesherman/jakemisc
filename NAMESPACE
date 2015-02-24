@@ -2,7 +2,11 @@
 
 export(changeColClass)
 export(changeColName)
+export(changeColOrder)
+export(createDelimited)
+export(createDirIfNotExist)
 export(createMatchup)
+export(dtEval)
 export(factorToNumeric)
 export(matchup)
 export(packages)

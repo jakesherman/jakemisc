@@ -10,10 +10,10 @@ packages(..., install = TRUE, results = FALSE, order = "ascending")
 \item{...}{one or more package names, each seperated by a comma. You do not
 have to put a comma around the individual package names, though you may do so.}
 
-\item{install}{do you want to install packages that a user doesn't have
+\item{install}{do you want to install packages that a user doesnt have
 installed? Default is TRUE, your other options are FALSE, or "prompt," where
 a user in an interactive session will be prompted as to whether or not they
-want packages() to install the packages for them or not.}
+want \code{packages()} to install the packages for them or not.}
 
 \item{results}{Should a results table be included in output showing which
 packages loaded, newly_installed, or failed to do either? TRUE or FALSE,
@@ -30,56 +30,63 @@ Either loads, or installs and then loads, one or more packages from either
 CRAN or from public repos on Github/Bitbucket. This function is useful when
 sharing code with collaborators who may or may not have certain packages
 installed. It can also save time vs. typing out many library functions or
-devtools::install_github/devtools::install_bitbucket functions.
+\code{devtools::install_github}/\code{devtools::install_bitbucket} functions.
 }
 \details{
-You also have the option of putting a double colon (::) after a package name
-to just install a package if it isn't installed, so that you may use :: to
-access functions from within the package.
+You also have the option of putting a double colon (\code{::}) after a
+package name to just install a package if it isnt installed, so that you may
+use \code{::} to access functions from within the package.
 
-While the install argument is set to TRUE by default, and will download/
-install any packages specificed that you don't have, you may also change the
-install argument so that it prompts the user to install packages
+While the install argument is set to \code{TRUE} by default, and will
+download/ install any packages specificed that you dont have, you may also
+change the install argument so that it prompts the user to install packages.
 }
 \examples{
-First, let's try replicating library(pryr) with packages():
+First, lets try replicating library(pryr) with \\code{packages()}:
 
-packages(pryr)
+\\code{packages(pryr)}
 
 The packages() function takes multiple package names, and may be used to
 load/install multiple packages, for example:
 
-packages(pryr, data.table)
+\\code{packages(pryr, data.table)}
 
 In addition to packages from CRAN, you can install packages from public repos
 on Github or Bitbucket. To install a Github package, in a string type the
 GitHub username, followed by a /, followed by the repo name, like so:
 
-packages("jakesherman/jakemisc")
+\\code{packages("jakesherman/jakemisc")}
 
 For Bitbucket packages, use the "$" symbol:
 
-packages(jakesherman$jakemisc)
+\\code{packages(jakesherman$jakemisc)}
 
 Mixing CRAN and Github packages:
 
-packages(pryr, data.table, "RODBC", "jaker/jakesherman")
+\\code{packages(pryr, data.table, "RODBC", "jakesherman/jakemisc")}
 
 You may also add a double colon after a package name to indicate that you
 want the package to be installed, but you do not want to explicitly attach
 the package. The idea here is that you are going to load the package when
 you use :: to call a function from a package. See an example:
 
-packages(plyr, "dplyr::")
+\\code{packages(plyr, "dplyr::")}
 
 Note that this function uses non-standard evaluation for the package names,
 meaning that you dont need to put quotes around the names of your packages.
-You may do so however if you choose, doing so won't affect the function. The
+You may do so however if you choose, doing so wont affect the function. The
 exception is that any package name with a double colon, ::, needs to be in
 quotes:
 
-packages("pryr", data.table, "RODBC::", jaker/jakesherman)
-packages(pryr, "data.table::", "RODBC::", "jaker/jakesherman")
+\\code{packages("pryr", data.table, "RODBC::", jakesherman/jakemisc)}
+\\code{packages(pryr, "data.table::", "RODBC::", jakesherman/jakemisc)}
+
+You may also specify the GitHub branch to install a GitHub package from, the
+default of course being the master branch. Please note that this function
+cannot tell whether or not a currently installed package is the package
+version of a particular GitHub branch.
+
+\\code{packages(jakesherman/jakemisc@development)}
 }
 \keyword{CRAN,}
 \keyword{Github,}

@@ -7,6 +7,10 @@
 ##
 ## =============================================================================
 
+# compatibility for data.table functions
+# (see: https://github.com/hadley/dplyr/issues/548)
+.datatable.aware <- TRUE
+
 # Function for getting a numerical vector of the positions of a pattern
 # within a string (using regex, from the grepexpr function)
 patternPositions <- function(string, pattern, ignore.case = FALSE) {
@@ -41,4 +45,18 @@ NSEtoVector <- function(..., USE.NAMES = FALSE) {
     }, USE.NAMES = USE.NAMES)
     
     return(package_names)
+}
+
+# Given a string a symbol, return the position of the symbol w/i the string
+getSymbolPosition <- function(string, symbol) {
+    return(gregexpr(symbol, string)[[1]][1])
+}
+
+# Seperate a character vector of length 1 based on an inputted symbol
+seperateSymbol <- function(string, symbol) {
+    symbolPosition <- getSymbolPosition(string, symbol)
+    before_symbol <- substr(string, 1, (symbolPosition - 1))
+    after_symbol <- substr(string, (symbolPosition + 1), 
+                   nchar(string))
+    return(c(before_symbol, after_symbol))
 }

@@ -5,7 +5,11 @@
 \title{valuesToValue()}
 \usage{
 valuesToValue(data = NULL, values = NULL, valueToConvertTo = NULL,
+<<<<<<< HEAD
   onlyConvert = NULL, noConvert = NULL, ref = TRUE, warnings = TRUE)
+=======
+  onlyConvert = NULL, noConvert = NULL, ref = TRUE, invisible = TRUE)
+>>>>>>> development
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
@@ -28,11 +32,17 @@ specify both.}
 \item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
 the data.table by reference (modifying-in-place), if FALSE, do not modify
 the data.table by reference, instead treat it like a data.frame (copy on
+<<<<<<< HEAD
 modify). When combining this function with the magrittr package, use the
 \code{\%T>\%} operator before this function to modify-in-place.}
 
 \item{warnings}{TRUE (default) or FALSE, should warnings occur when
 modifications by reference occur or conversions take place?}
+=======
+modify).}
+
+\item{invisible}{TRUE (by default), invisibly return the data?}
+>>>>>>> development
 }
 \description{
 Given a data.frame or data.table, turns selected values into a different value for
@@ -44,18 +54,26 @@ conversion done on them. You may only choose to specify onlyConvert or
 noConvert, you may not specify both at the same time.
 }
 \details{
+<<<<<<< HEAD
 By default, modification by reference will occur for data.tables. To turn
 this off, set ref to FALSE. By default warnings is set to TRUE.
+=======
+This function uses seperate methods for data.tables and data.frames. By
+default, data.tables will be modified by reference. To turn off this
+behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+will be invisibly returned.
+>>>>>>> development
 }
 \examples{
 Lets say we want to convert "na" or -500 values into "jake" for only the
 columns "town" and "city" in my_data:
-valuesToNA(my_data, c("na", -500), "jake" ,onlyConvert = c("town", "city"))
+\\code{valuesToNA(my_data, c("na", -500), "jake",
+                 onlyConvert = c("town", "city"))}
 
 Or, what if we want to convert "na" or -500 values into "jake" for every
 columnn in my_data except for "town", "city", or "country":
-valuesToNA(my_data, c("na", -500), "jake", noConvert = c("town", "city",
-"country"))
+\\code{valuesToNA(my_data, c("na", -500), "jake",
+                 noConvert = c("town", "city", "country"))}
 }
 \keyword{change,}
 \keyword{value,}

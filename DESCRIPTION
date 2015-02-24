@@ -1,14 +1,15 @@
 Package: jakemisc
 Title: A set of misc. functions from Jake Sherman.
-Version: 0.1.0.9000
+Version: 0.1.0.1
 Authors@R: "Jake Sherman <jake@jakesherman.com> [aut, cre]"
 Description: A set of misc. functions from Jake Sherman.
 Depends:
     R (>= 3.0.0)
 Imports:
+    data.table,
     devtools,
     fastmatch
 Suggests:
-    data.table
+    dplyr
 License: MIT License
 LazyData: true
