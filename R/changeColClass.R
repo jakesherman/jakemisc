@@ -2,37 +2,43 @@
 #'
 #' Changes the class of columns from one class to another class, ex. change all
 #' columns of class factor into columns of class character. Works on both
-#' data.frames and data.tables. You may also specify either a) specific columns
-#' to do this conversion on, or alternatively b) specific columns that you do not
-#' want converted. 
+#' \code{data.frames} and \code{data.tables}. You may also specify either 
+#' a) specific columns to do this conversion on, or alternatively b) specific 
+#' columns that you do not want converted.
 #' 
-#' Note that this function has side effects, namely, it modifies
-#' an object in its calling environment. This was necessary for data.tables, as
-#' the goal is to modify them in place. I decided to do the same for data
-#' frames to make the function syntax the same, even though R won't do 
-#' modification in place for data frames. 
+#' This function uses seperate methods for data.tables and data.frames. By 
+#' default, data.tables will be modified by reference. To turn off this
+#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+#' will be invisibly returned. 
 #' 
-#' @keywords convert, data.table, factor, numeric, character, data, table
-#' @param data a data.frame or data.table
+#' @keywords convert, data.table, factor, numeric, character, data, table, frame
+#' @param data a \code{data.frame} or \code{data.table} 
 #' @param startingClass the column type you want converted
 #' @param finalClass the column type you want to convert startingClass into
 #' @param onlyConvert optional - specify a vector of one or more column names
-#' as the only columns where the class conversion will take place. You may either
-#' have this parameter satified, or the noConvert parameter specified, you may
-#' not specify both.
+#' as the only columns where the class conversion will take place. You may 
+#' either have this parameter satified, or the noConvert parameter specified, 
+#' you may not specify both.
 #' @param noConvert optional - specify a vector of one or more columns names 
 #' that you do not want any conversion applied to. You may either have this 
 #' parameter satified, or the noConvert parameter specified, you may not 
 #' specify both.
+#' @param invisible TRUE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
-#' changeColClass(my_data, "factor", "character")
-#' changeColClass(my_data, "numeric", "character", onlyConvert = c(my_cols))
-#' changeColClass(my_data, "numeric", "character", noConvert = "special_col")
+#' \code{changeColClass(my_data, "factor", "character")}
+#' \code{changeColClass(my_data, "numeric", "character", 
+#'                      onlyConvert = c(my_cols))}
+#' \code{changeColClass(my_data, "numeric", "character", 
+#'                      noConvert = "special_col")}
 
 changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
-                           onlyConvert = NULL, noConvert = NULL) {
+                           onlyConvert = NULL, noConvert = NULL, ref = TRUE,
+                           invisible = TRUE) {
+    
+    # NSE to get name of data
+    data_name <- deparse(substitute(data))
     
     ## Error handling ----------------------------------------------------------
     
@@ -41,8 +47,8 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     if (is.null(startingClass)) stop("Requires argument for startingClass")
     if (is.null(finalClass)) stop("Requires argument for finalClass")
     
-    # If data isn't a data.table or data.frame, get outta here
-    if (!(is.data.frame(data) | is.data.table(data))) {
+    # If data isn't a data.frame, get outta here
+    if (!(is.data.frame(data))) {
         stop("The data argument must be a data frame/table")
     }
     
@@ -63,7 +69,7 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
         
     } else if (!is.null(onlyConvert)) {
         
-        # onlyConvert - take any col_names out if they are in onlyConvert 
+        # onlyConvert - take any col_names out if they aren't in onlyConvert 
         col_names <- col_names[col_names %in% onlyConvert]
         
     } else if (!is.null(noConvert)) {
@@ -76,28 +82,69 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     # no columns of type startingClass in your data
     if (length(col_names) == 0) {
         print(sapply(data, class))
-        stop(paste0("There were no columns found in the data of the ",
-                    "type you entered in startingClass. Please check ",
-                    "the above output of the class of each column ",
-                    "in your data to see if the class you entered ",
-                    "in startingClass exists."))
+        stop("There were no columns found in the data of the ",
+             "type you entered in startingClass. Please check ",
+             "the above output of the class of each column ",
+             "in your data to see if the class you entered ",
+             "in startingClass exists.")
     }
     
-    # Use NSE to get the name of the data argument
-    data_name <- deparse(substitute(data)) 
+    ## Do the conversion - different method based on data type. Turn this into
+    ## S3 at some point? Or not worth it?
     
-    ## Do the conversion - different method based on data type
-    
-    if (inherits(data, "data.table")) {
+    if (ref == FALSE) {
         
-        ## If data is a data.table ---------------------------------------------
+        ## If ref is set to FALSE from its default of TRUE ---------------------
+        
+        # If data is a data.table, create an explicit copy of data, do the 
+        # conversion by reference on that copy, then return the copy. If data
+        # is not a data.table (though it should be, otherwise there is no good
+        # reason to set ref to FALSE) do data.frame conversion.
+        
+        if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
+            
+            # Make an explicit copy of the data
+            data <- copy(data)
+            
+            # Data.table conversion
+            if (startingClass == "factor" & finalClass == "numeric") {
+                data[, (col_names) := lapply(.SD, factorToNumeric), 
+                     .SDcols = col_names]
+                
+            } else {
+                lapply_exp <- paste0("lapply(.SD, as.", finalClass, ")")
+                eval_this <- parse(text = lapply_exp)
+                data[, (col_names) := eval(eval_this), .SDcols = col_names]
+            }
+            
+        } else {
+            
+            # Data.frame conversion
+            
+            if (startingClass == "factor" & finalClass == "numeric") {
+                
+                # Special case where we are going from factor to numeric. 
+                data[col_names] <- lapply(data[col_names], factorToNumeric)
+                
+            } else {
+                
+                # Convert col_names to the appropirate column type
+                lapply_exp <- paste0("data[col_names] <- lapply(data[col_names", 
+                                     "], as.", finalClass, ")")
+                eval_this <- parse(text = lapply_exp)
+                eval(eval_this)
+            }
+        }
+        
+    } else if (inherits(data, "data.table") & 
+                   isPackageInstalled("data.table")) {
+        
+        ## Modifying a data.table by reference ---------------------------------
         
         if (startingClass == "factor" & finalClass == "numeric") {
             
-            # Special case where we are going from factor to numeric. In this 
-            # case we can use the factorToNumeric function instead of 
-            # as.numeric to make sure that we aren't converting the levels of
-            data[, (col_names):=lapply(.SD, factorToNumeric), 
+            # Special case where we are going from factor to numeric. 
+            data[, (col_names) := lapply(.SD, factorToNumeric), 
                  .SDcols = col_names]
             
         } else {
@@ -105,37 +152,39 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
             # Convert col_names to the appropirate column type
             lapply_exp <- paste0("lapply(.SD, as.", finalClass, ")")
             eval_this <- parse(text = lapply_exp)
-            data[, (col_names):=eval(eval_this), .SDcols = col_names]
+            data[, (col_names) := eval(eval_this), .SDcols = col_names]
         }
+        
+        message(data_name, " modified by reference b/c it is a data.table, and",
+                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                "this behavior.")
         
     } else {
         
-        ## If data is a data.frame --------------------------------------------- 
+        ## Dealing with a data.frame -------------------------------------------
         
         if (startingClass == "factor" & finalClass == "numeric") {
             
-            # Special case where we are going from factor to numeric. In this 
-            # case we can use the factorToNumeric function instead of 
-            # as.numeric to make sure that we aren't converting the levels of
+            # Special case where we are going from factor to numeric. 
             data[col_names] <- lapply(data[col_names], factorToNumeric)
-            
-            # Modify in place (but copying the data frame) data
-            command <- paste0(data_name, " <<- data")
-            eval_this <- parse(text = command)
-            eval(eval_this)
             
         } else {
             
             # Convert col_names to the appropirate column type
-            lapply_exp <- paste0("data[col_names] <- lapply(data[col_names], as.", 
-                                 finalClass, ")")
+            lapply_exp <- paste0("data[col_names] <- lapply(data[col_names], ", 
+                                 "as.", finalClass, ")")
             eval_this <- parse(text = lapply_exp)
             eval(eval_this)
-            
-            # Modify in place (but copying the data frame) data
-            command <- paste0(data_name, " <<- data")
-            eval_this <- parse(text = command)
-            eval(eval_this)
         }
+    }
+    
+    # Silently return the data - this way we can use this function in magrittr
+    # pipes, plus we can run the data.table functions without assignment (for
+    # operations that can work only by reference)
+    if (invisible == TRUE) {
+        return(invisible(data))
+        
+    } else {
+        return(data)
     }
 }

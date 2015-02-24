@@ -1,16 +1,16 @@
 #' changeColName()
 #'
 #' Changes a column name from one to another. Accepts both data frames and 
-#' data.tables. 
+#' data.tables. Multiple column names can be changed with the simple syntax
+#' \code{old_column_name/new_column_name}.
 #' 
-#' Note that this function has side effects, namely, it modifies
-#' an object in its calling environment. This was necessary for data.tables, as
-#' the goal is to modify them in place. I decided to do the same for data
-#' frames to make the function syntax the same, even though R won't do 
-#' modification in place for data frames. 
+#' This function uses seperate methods for data.tables and data.frames. By 
+#' default, data.tables will be modified by reference. To turn off this
+#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+#' will be invisibly returned. 
 #' 
 #' @keywords matchup, match, up, lookup, crosswalk
-#' @param data a data.frame or data.table 
+#' @param data a \code{data.frame} or \code{data.table} 
 #' @param ... either a) if you are only changing one column, the current column
 #' name, followed by a comma and then the desired column name (option of NSE), 
 #' or b) one or more of the following: current_column_name/desired_column_name,
@@ -20,19 +20,23 @@
 #' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
 #' the data.table by reference (modifying-in-place), if FALSE, do not modify
 #' the data.table by reference, instead treat it like a data.frame (copy on
-#' modify). When combining this function with the magrittr package, use the
-#' \code{\%T>\%} operator before this function to modify-in-place.
+#' modify). 
 #' @param warnings TRUE (default) or FALSE, should warnings occur when 
 #' modifications by reference occur or conversions take place?
+#' @param invisible TRUE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
 #' Here is how to change a column name, where we change a column named "Jake"
 #' into one named "Josh":
 #' 
-#' changeColName(my_data, "Jake", "Josh")
+#' \code{changeColName(my_data, "Jake", "Josh")}
 
-changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
+changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
+                          invisible = TRUE) {
+    
+    # NSE to get name of data
+    data_name <- deparse(substitute(data))
     
     ## Get all of the column name changes we are doing -------------------------
     
@@ -43,7 +47,6 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
     # If length of ... is 2 and no / is present, treat it as one name change, 
     # otherwise we have one or more name changes that use forward slashes
     if (length(name_changes) == 2 & !all(grepl("/", name_changes))) {
-        
         name_changes_list[[1]] <- c(name_changes[1], name_changes[2])
         
     } else {
@@ -105,7 +108,7 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
             }
         }
         
-        ## Update col_names ----------------
+        # Update col_names 
         col_names <- newColNames(col_names, current_colname, desired_colname)
     }
     
@@ -127,12 +130,10 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
             # warnings from data.table
             data <- copy(data)
             setnames(data, names(data), col_names)
-            return(data)
             
         } else {
             
             names(data) <- col_names
-            return(data)
         }
         
     } else if ("data.table" %in% class(data) & 
@@ -141,13 +142,22 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
         ## If data is a data.table ---------------------------------------------
         
         setnames(data, names(data), col_names)
-        return(invisible())
+        message(data_name, " modified by reference b/c it is a data.table, and",
+                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                "this behavior.")
         
     } else {
         
         ## If data is a data.frame --------------------------------------------- 
         
         names(data) <- col_names
+    }
+    
+    # Return the data
+    if (invisible == TRUE) {
+        return(invisible(data))
+        
+    } else {
         return(data)
     }
 }

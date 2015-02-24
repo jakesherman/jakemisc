@@ -4,10 +4,10 @@
 \alias{changeColOrder}
 \title{changeColOrder()}
 \usage{
-changeColOrder(data, ..., ref = TRUE, warnings = TRUE)
+changeColOrder(data, ..., ref = TRUE, warnings = TRUE, invisible = TRUE)
 }
 \arguments{
-\item{data}{a data.frame or data.table}
+\item{data}{a \code{data.frame} or \code{data.table}}
 
 \item{...}{either a) if you are only changing one column, the current column
 name, followed by a comma and then the desired column name (option of NSE),
@@ -24,27 +24,29 @@ modify). When combining this function with the magrittr package, use the
 
 \item{warnings}{TRUE (default) or FALSE, should warnings occur when
 modifications by reference occur or conversions take place?}
+
+\item{invisible}{TRUE (by default), invisibly return the data?}
 }
 \description{
 Changes a column name from one to another. Accepts both data frames and
 data.tables.
 }
 \details{
-Note that this function has side effects, namely, it modifies
-an object in its calling environment. This was necessary for data.tables, as
-the goal is to modify them in place. I decided to do the same for data
-frames to make the function syntax the same, even though R won't do
-modification in place for data frames.
+This function uses seperate methods for data.tables and data.frames. By
+default, data.tables will be modified by reference. To turn off this
+behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+will be invisibly returned.
 }
 \examples{
 Here is how to change a column name, where we change a column named "Jake"
 into one named "Josh":
 
-changeColOrder(my_data, "Jake", "Josh")
+\\code{changeColOrder(my_data, "Jake", "Josh")}
 }
-\keyword{crosswalk}
-\keyword{lookup,}
-\keyword{match,}
-\keyword{matchup,}
-\keyword{up,}
+\keyword{change,}
+\keyword{col,}
+\keyword{column}
+\keyword{column,}
+\keyword{order,}
+\keyword{ordering}
 

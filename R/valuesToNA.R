@@ -8,8 +8,10 @@
 #' conversion done on them. You may only choose to specify onlyConvert or 
 #' noConvert, you may not specify both at the same time. 
 #' 
-#' By default, modification by reference will occur for data.tables. To turn 
-#' this off, set ref to FALSE. By default warnings is set to TRUE.
+#' This function uses seperate methods for data.tables and data.frames. By 
+#' default, data.tables will be modified by reference. To turn off this
+#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+#' will be invisibly returned. 
 #' 
 #' @keywords valuesToNA, NA
 #' @param data a data frame/table that we want to remove NAs from
@@ -26,10 +28,8 @@
 #' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
 #' the data.table by reference (modifying-in-place), if FALSE, do not modify
 #' the data.table by reference, instead treat it like a data.frame (copy on
-#' modify). When combining this function with the magrittr package, use the
-#' \code{\%T>\%} operator before this function to modify-in-place.
-#' @param warnings TRUE (default) or FALSE, should warnings occur when 
-#' modifications by reference occur or conversions take place?
+#' modify). 
+#' @param invisible TRUE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
@@ -45,7 +45,7 @@
 #' \code{valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))}
 
 valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL, 
-                       noConvert = NULL, ref = TRUE, warnings = TRUE) {
+                       noConvert = NULL, ref = TRUE, invisible = TRUE) {
     
     ## Error handling ----------------------------------------------------------
     
@@ -104,8 +104,6 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
                 set(data, which(data[[col_name]] %in% c(values)), col_name, NA) 
             } 
             
-            return(data)
-            
         } else {
             
             # Remove values from col_names
@@ -113,8 +111,6 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
                 f[which(f %in% values)] <- NA
                 return(f)
             })
-            
-            return(data) 
         }
         
     } else if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
@@ -127,11 +123,9 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
         } 
         
         # Warn the user that modification by reference occured
-        if (warnings) {
-            warning("Data modified by reference b/c data is a data.table.")
-        }
-        
-        return(invisible())
+        message(data_name, " modified by reference b/c it is a data.table, and",
+                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                "this behavior.")
         
     } else {
         
@@ -142,7 +136,13 @@ valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL,
             f[which(f %in% values)] <- NA
             return(f)
         })
+    }
+    
+    # Return the data
+    if (invisible == TRUE) {
+        return(invisible(data))
         
-        return(data) 
+    } else {
+        return(data)
     }
 }

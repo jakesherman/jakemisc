@@ -13,9 +13,11 @@ matchup(require_matches, matching_data, match_this, to_this)
 i.e. the column names you are inputting in the match_this and to_this
 arguments.}
 
-\item{match_this}{column name of what you want matched (ex. state initials)...}
+\item{match_this}{column name of what you want matched (ex. state
+initials)...}
 
-\item{to_this}{...column name of what you want the above matched to (ex. state names)}
+\item{to_this}{...column name of what you want the above matched to (ex.
+state names)}
 }
 \description{
 Created as a quick way to match two variables that have a 1:1
@@ -24,7 +26,7 @@ one is returned (to get around this, use merge() or a similar, more proper
 function).
 }
 \details{
-Another function of mine, createMatchup(), creates closures
+Another function of mine, \code{createMatchup()}, creates closures
 based on this function, which can be useful for creating reuseable matching
 functions on the fly.
 

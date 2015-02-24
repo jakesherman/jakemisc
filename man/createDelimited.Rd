@@ -4,15 +4,15 @@
 \alias{createDelimited}
 \title{createDelimited()}
 \usage{
-createDelimited(table, delimit_this, by_this, delimiter = ", ",
-  filter = NULL, returnDT = NULL, keepCols = NULL)
+createDelimited(data, delimitThis, byThis, delimiter = ", ", filter = NULL,
+  returnDT = NULL, keepCols = NULL, invisible = TRUE)
 }
 \arguments{
-\item{table}{a data.frame or data.table}
+\item{data}{a \code{data.frame} or \code{data.table}}
 
-\item{delimit_this}{the column that you want to become a delimited field}
+\item{delimitThis}{the column that you want to become a delimited field}
 
-\item{by_this}{the Id column which seperates different delimited sections}
+\item{byThis}{the Id column which seperates different delimited sections}
 
 \item{delimiter}{which delimiter do you want to use? Default is ", "}
 
@@ -22,17 +22,29 @@ filter function) to filter the data before creating delimited fields}
 \item{returnDT}{NULL by default, can set to TRUE or FALSE to explicitly
 return a data.table. By default, a data.table is returned if table is a
 data.table, and a data.frame is returned if table is a data.frame.}
+
+\item{keepCols}{a vector of column names from \code{data} to keep in the
+final table. Keep in mind that only the first column corresponding with
+each \code{byThis} will be kept. Using \code{keepCols} is really only useful
+when the columns you are interested in have identical rows for each unique
+value of \code{byThis}.}
+
+\item{invisible}{TRUE (by default), invisibly return the data?}
 }
 \description{
-Turns long data into delimited data. Ex., imagine you have a table with 2
-columns, the first is an Id column with "A" repeated 3 times, the second
-column has rows X then Y then Z. This function would turn this table from
-having three rows into having one row where X, Y, Z are delimited by
-some delimiter (the default is ", " like the above example).
+Turns long data into delimited data.
 }
-\keyword{crosswalk}
-\keyword{lookup,}
-\keyword{match,}
-\keyword{matchup,}
-\keyword{up,}
+\details{
+Ex., imagine you have a table with 2 columns, the first is an Id column
+with "A" repeated 3 times, the second  column has rows X then Y then Z.
+This function would turn this table from having three rows into having one
+row where X, Y, Z are delimited by some delimiter (the default is ", "
+like the above example).
+}
+\examples{
+delimited <- createDelimited(myData, "soccerPlayers")
+}
+\keyword{create,}
+\keyword{delimited,}
+\keyword{table}
 

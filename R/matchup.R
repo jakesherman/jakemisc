@@ -5,7 +5,7 @@
 #' one is returned (to get around this, use merge() or a similar, more proper
 #' function). 
 #' 
-#' Another function of mine, createMatchup(), creates closures
+#' Another function of mine, \code{createMatchup()}, creates closures
 #' based on this function, which can be useful for creating reuseable matching
 #' functions on the fly. 
 #' 
@@ -17,8 +17,10 @@
 #' @param matching_data a data frame containing columns matching two things,
 #' i.e. the column names you are inputting in the match_this and to_this 
 #' arguments.
-#' @param match_this column name of what you want matched (ex. state initials)...
-#' @param to_this ...column name of what you want the above matched to (ex. state names)
+#' @param match_this column name of what you want matched (ex. state 
+#' initials)...
+#' @param to_this ...column name of what you want the above matched to (ex. 
+#' state names)
 #' @export
 #' @examples
 #' 

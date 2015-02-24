@@ -3,14 +3,13 @@
 #' Changes a column name from one to another. Accepts both data frames and 
 #' data.tables. 
 #' 
-#' Note that this function has side effects, namely, it modifies
-#' an object in its calling environment. This was necessary for data.tables, as
-#' the goal is to modify them in place. I decided to do the same for data
-#' frames to make the function syntax the same, even though R won't do 
-#' modification in place for data frames. 
+#' This function uses seperate methods for data.tables and data.frames. By 
+#' default, data.tables will be modified by reference. To turn off this
+#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+#' will be invisibly returned.
 #' 
-#' @keywords matchup, match, up, lookup, crosswalk
-#' @param data a data.frame or data.table 
+#' @keywords change, col, column, order, column order, column ordering
+#' @param data a \code{data.frame} or \code{data.table} 
 #' @param ... either a) if you are only changing one column, the current column
 #' name, followed by a comma and then the desired column name (option of NSE), 
 #' or b) one or more of the following: current_column_name/desired_column_name,
@@ -24,15 +23,17 @@
 #' \code{\%T>\%} operator before this function to modify-in-place.
 #' @param warnings TRUE (default) or FALSE, should warnings occur when 
 #' modifications by reference occur or conversions take place?
+#' @param invisible TRUE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
 #' Here is how to change a column name, where we change a column named "Jake"
 #' into one named "Josh":
 #' 
-#' changeColOrder(my_data, "Jake", "Josh")
+#' \code{changeColOrder(my_data, "Jake", "Josh")}
 
-changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
+changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE, 
+                           invisible = TRUE) {
     
     ## Get all of the column name changes we are doing -------------------------
     
@@ -100,6 +101,7 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
         # Return the new column order
         if (direction == "left") {
             newOrder <- c(left_this, left_of_pos, this_col_pos, right_this)
+            
         } else {
             newOrder <- c(left_this, this_col_pos, left_of_pos, right_this)
         }
@@ -111,6 +113,7 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
     # column name changes
     col_names <- names(data)
     col_order <- NULL
+    
     for (i in seq_along(order_changes_list)) {
         
         ## Get the first and second columns, and if it's a left arrow ----------
@@ -131,6 +134,7 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
         if (isLeftArrow) {
             col_order <- newColOrders(col_names, first_col, second_col, "left")
             col_names <- col_names[col_order]
+            
         } else {
             col_order <- newColOrders(col_names, first_col, second_col, "right")
             col_names <- col_names[col_order]
@@ -155,12 +159,9 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
             # warnings from data.table
             data <- copy(data)
             setnames(data, names(data), col_names)
-            return(data)
             
         } else {
-            
             names(data) <- col_names
-            return(data)
         }
         
     } else if ("data.table" %in% class(data) & 
@@ -169,13 +170,22 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
         ## If data is a data.table ---------------------------------------------
         
         setnames(data, names(data), col_names)
-        return(invisible())
+        message(data_name, " modified by reference b/c it is a data.table, and",
+                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                "this behavior.")
         
     } else {
         
         ## If data is a data.frame --------------------------------------------- 
         
         names(data) <- col_names
+    }
+    
+    # Return the data
+    if (invisible == TRUE) {
+        return(invisible(data))
+        
+    } else {
         return(data)
     }
 }

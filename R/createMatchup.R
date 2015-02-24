@@ -1,16 +1,19 @@
 #' createMatchup()
 #'
-#' Creates a closure of the matchup() function that stores with the matchup()
-#' function data for all of its arguments except for its first, the vector of 
-#' elements that need to be matched. This allows one to create quick, 1:1 
-#' matching functions that can be reused.
+#' Creates a closure of the \code{matchup()} function that stores with the 
+#' \code{matchup()} function data for all of its arguments except for its first, 
+#' the vector of elements that need to be matched. This allows one to create 
+#' quick, 1:1 matching functions that can be reused, akin to Excel's VLOOKUP
+#' or INDEX/MATCH functionality.
 #' 
 #' @keywords matchup, match, up, lookup, crosswalk
 #' @param matching_data a data frame containing columns matching two things,
 #' i.e. the column names you are inputting in the match_this and to_this 
 #' arguments.
-#' @param match_this column name of what you want matched (ex. state initials)...
-#' @param to_this ...column name of what you want the above matched to (ex. state names)
+#' @param match_this column name of what you want matched (ex. state 
+#' initials)...
+#' @param to_this ...column name of what you want the above matched to (ex. 
+#' state names)
 #' @export
 #' @examples
 #' 
@@ -18,22 +21,21 @@
 #' initials to state names, like the example for the matchup() function. 
 #' Remember, this is how we matched state initials to names before:
 #' 
-#' matchup(vector_of_state_initials, us_states, "state", "state_name")
+#' \code{matchup(vector_of_state_initials, us_states, "state", "state_name")}
 #' 
 #' Now let's create a function to do this, called initials_to_names():
 #' 
-#' initals_to_names <- createMatchup(us_states, "state", "state_name")
+#' \code{initals_to_names <- createMatchup(us_states, "state", "state_name")}
 #' 
 #' Now, we just need to input the vector_of_state_initials that was the first
 #' argument in the matchup() function above to produce its output when it comes
 #' to matching state names to initials. This:
 #' 
-#' initials_to_names(vector_of_state_initials)
+#' \code{initials_to_names(vector_of_state_initials)}
 #' 
 #' Produces the same output as this:
 #' 
-#' matchup(vector_of_state_initials, us_states, 
-#'                        "state", "state_name")
+#' \code{matchup(vector_of_state_initials, us_states, "state", "state_name")}
 
 createMatchup <- function(matching_data, match_this, to_this) {
     

@@ -5,49 +5,53 @@
 \title{changeColClass()}
 \usage{
 changeColClass(data = NULL, startingClass = NULL, finalClass = NULL,
-  onlyConvert = NULL, noConvert = NULL)
+  onlyConvert = NULL, noConvert = NULL, ref = TRUE, invisible = TRUE)
 }
 \arguments{
-\item{data}{a data.frame or data.table}
+\item{data}{a \code{data.frame} or \code{data.table}}
 
 \item{startingClass}{the column type you want converted}
 
 \item{finalClass}{the column type you want to convert startingClass into}
 
 \item{onlyConvert}{optional - specify a vector of one or more column names
-as the only columns where the class conversion will take place. You may either
-have this parameter satified, or the noConvert parameter specified, you may
-not specify both.}
+as the only columns where the class conversion will take place. You may
+either have this parameter satified, or the noConvert parameter specified,
+you may not specify both.}
 
 \item{noConvert}{optional - specify a vector of one or more columns names
 that you do not want any conversion applied to. You may either have this
 parameter satified, or the noConvert parameter specified, you may not
 specify both.}
+
+\item{invisible}{TRUE (by default), invisibly return the data?}
 }
 \description{
 Changes the class of columns from one class to another class, ex. change all
 columns of class factor into columns of class character. Works on both
-data.frames and data.tables. You may also specify either a) specific columns
-to do this conversion on, or alternatively b) specific columns that you do not
-want converted.
+\code{data.frames} and \code{data.tables}. You may also specify either
+a) specific columns to do this conversion on, or alternatively b) specific
+columns that you do not want converted.
 }
 \details{
-Note that this function has side effects, namely, it modifies
-an object in its calling environment. This was necessary for data.tables, as
-the goal is to modify them in place. I decided to do the same for data
-frames to make the function syntax the same, even though R won't do
-modification in place for data frames.
+This function uses seperate methods for data.tables and data.frames. By
+default, data.tables will be modified by reference. To turn off this
+behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
+will be invisibly returned.
 }
 \examples{
-changeColClass(my_data, "factor", "character")
-changeColClass(my_data, "numeric", "character", onlyConvert = c(my_cols))
-changeColClass(my_data, "numeric", "character", noConvert = "special_col")
+\\code{changeColClass(my_data, "factor", "character")}
+\\code{changeColClass(my_data, "numeric", "character",
+                     onlyConvert = c(my_cols))}
+\\code{changeColClass(my_data, "numeric", "character",
+                     noConvert = "special_col")}
 }
 \keyword{character,}
 \keyword{convert,}
 \keyword{data,}
 \keyword{data.table,}
 \keyword{factor,}
+\keyword{frame}
 \keyword{numeric,}
-\keyword{table}
+\keyword{table,}
 
