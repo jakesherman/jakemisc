@@ -23,7 +23,7 @@
 #' each \code{byThis} will be kept. Using \code{keepCols} is really only useful
 #' when the columns you are interested in have identical rows for each unique
 #' value of \code{byThis}.
-#' @param invisible TRUE (by default), invisibly return the data?
+#' @param invisible FALSE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
@@ -32,17 +32,17 @@
 # Function for delimited tables
 createDelimited <- function(data, delimitThis, byThis, delimiter = ", ",
                             filter = NULL, returnDT = NULL,
-                            keepCols = NULL, invisible = TRUE) {
+                            keepCols = NULL, invisible = FALSE) {
     
     # If data is a data.table, copy it, if not don't
     if (inherits(data, "data.table")) {
-        myTable <- copy(table)
+        myTable <- copy(data)
     } else {
-        myTable <- data.table(table)
+        myTable <- data.table(data)
     }
     
     # Get table names
-    tableNames <- names(table)
+    tableNames <- names(data)
     
     # If FILTER isn't NULL, run the filter
     if (!is.null(filter)) {
@@ -70,20 +70,6 @@ createDelimited <- function(data, delimitThis, byThis, delimiter = ", ",
     
     # Set returnDT to 0 if NULL
     if (is.null(returnDT)) returnDT <- 0
-    
-    # Return the table
-    if (returnDT == TRUE) {
-        return(myTable)
-        
-    } else if (returnDT == FALSE) {
-        return(as.data.frame(myTable))
-        
-    } else if (inherits(table, "data.table")) {
-        return(myTable)
-        
-    } else {
-        return(as.data.frame(myTable))
-    }
     
     # Return the data
     if (invisible == TRUE) {
