@@ -2,28 +2,31 @@
 #'
 #' Changes the class of columns from one class to another class, ex. change all
 #' columns of class factor into columns of class character. Works on both
-#' \code{data.frames} and \code{data.tables}. You may also specify either 
+#' \code{data.frame} and \code{data.table} classes. You may also specify either 
 #' a) specific columns to do this conversion on, or alternatively b) specific 
-#' columns that you do not want converted.
+#' columns that you do not want conversion performed on. 
 #' 
 #' This function uses seperate methods for data.tables and data.frames. By 
 #' default, data.tables will be modified by reference. To turn off this
-#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-#' will be invisibly returned. 
+#' behavior, set \code{ref} to \code{FALSE}. 
 #' 
-#' @keywords convert, data.table, factor, numeric, character, data, table, frame
+#' @keywords convert, data.table, factor, numeric, character, data, table, frame,
+#' data.frame, class
 #' @param data a \code{data.frame} or \code{data.table} 
 #' @param startingClass the column type you want converted
 #' @param finalClass the column type you want to convert startingClass into
-#' @param onlyConvert optional - specify a vector of one or more column names
+#' @param onlyConvert OPTIONAL - specify a vector of one or more column names
 #' as the only columns where the class conversion will take place. You may 
 #' either have this parameter satified, or the noConvert parameter specified, 
 #' you may not specify both.
-#' @param noConvert optional - specify a vector of one or more columns names 
+#' @param noConvert OPTIONAL - specify a vector of one or more columns names 
 #' that you do not want any conversion applied to. You may either have this 
 #' parameter satified, or the noConvert parameter specified, you may not 
 #' specify both.
-#' @param invisible TRUE (by default), invisibly return the data?
+#' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
+#' the data.table by reference (modifying-in-place), if FALSE, do not modify
+#' the data.table by reference, instead treat it like a data.frame (copy on
+#' modify). 
 #' @export
 #' @examples
 #' 
@@ -34,8 +37,7 @@
 #'                      noConvert = "special_col")}
 
 changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
-                           onlyConvert = NULL, noConvert = NULL, ref = TRUE,
-                           invisible = TRUE) {
+                           onlyConvert = NULL, noConvert = NULL, ref = TRUE) {
     
     # NSE to get name of data
     data_name <- deparse(substitute(data))
@@ -43,13 +45,14 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     ## Error handling ----------------------------------------------------------
     
     # Missing arguments
-    if (is.null(data)) stop("Please enter the data argument")
+    if (is.null(data)) stop("Requires the data argument")
     if (is.null(startingClass)) stop("Requires argument for startingClass")
     if (is.null(finalClass)) stop("Requires argument for finalClass")
     
     # If data isn't a data.frame, get outta here
     if (!(is.data.frame(data))) {
-        stop("The data argument must be a data frame/table")
+        stop("The data argument must be a data.frame (or data.table), or ",
+             "inherit data.frame")
     }
     
     ## Get the column names of the columns that are of the class entered by
@@ -64,8 +67,8 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     if (!is.null(onlyConvert) & !is.null(noConvert)) {
         
         # If both onlyConvert and noConvert are specified, stop the function
-        stop(paste0("Only one of the two optional arguments onlyConvert and ",
-                    "noConvert may be specified at the same time."))
+        stop("Only one of the two optional arguments onlyConvert and ",
+                    "noConvert may be specified at the same time.")
         
     } else if (!is.null(onlyConvert)) {
         
@@ -81,7 +84,6 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
     # If col_names is empty aka character(0), stop the function, there are
     # no columns of type startingClass in your data
     if (length(col_names) == 0) {
-        print(sapply(data, class))
         stop("There were no columns found in the data of the ",
              "type you entered in startingClass. Please check ",
              "the above output of the class of each column ",
@@ -101,10 +103,10 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
         # is not a data.table (though it should be, otherwise there is no good
         # reason to set ref to FALSE) do data.frame conversion.
         
-        if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
+        if (inherits(data, "data.table")) {
             
             # Make an explicit copy of the data
-            data <- copy(data)
+            data <- data.table::copy(data)
             
             # Data.table conversion
             if (startingClass == "factor" & finalClass == "numeric") {
@@ -136,8 +138,7 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
             }
         }
         
-    } else if (inherits(data, "data.table") & 
-                   isPackageInstalled("data.table")) {
+    } else if (inherits(data, "data.table")) {
         
         ## Modifying a data.table by reference ---------------------------------
         
@@ -155,6 +156,7 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
             data[, (col_names) := eval(eval_this), .SDcols = col_names]
         }
         
+        # Message that data was modified by reference
         message(data_name, " modified by reference b/c it is a data.table, and",
                 "ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
@@ -178,13 +180,6 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
         }
     }
     
-    # Silently return the data - this way we can use this function in magrittr
-    # pipes, plus we can run the data.table functions without assignment (for
-    # operations that can work only by reference)
-    if (invisible == TRUE) {
-        return(invisible(data))
-        
-    } else {
-        return(data)
-    }
+    # Return data
+    return(data)
 }

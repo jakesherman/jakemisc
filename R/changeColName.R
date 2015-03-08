@@ -1,15 +1,14 @@
 #' changeColName()
 #'
-#' Changes a column name from one to another. Accepts both data frames and 
-#' data.tables. Multiple column names can be changed with the simple syntax
-#' \code{old_column_name/new_column_name}.
+#' Changes a column name from one to another. Accepts both \code{data frame} and 
+#' \code{data.table} inputs. Multiple column names can be changed with the simple 
+#' syntax \code{old_column_name/new_column_name}.
 #' 
 #' This function uses seperate methods for data.tables and data.frames. By 
 #' default, data.tables will be modified by reference. To turn off this
-#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-#' will be invisibly returned. 
+#' behavior, set \code{ref} to \code{FALSE}. 
 #' 
-#' @keywords matchup, match, up, lookup, crosswalk
+#' @keywords change, col, column, name, names
 #' @param data a \code{data.frame} or \code{data.table} 
 #' @param ... either a) if you are only changing one column, the current column
 #' name, followed by a comma and then the desired column name (option of NSE), 
@@ -96,9 +95,9 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
                 
                 # Modify the install variable based on user input
                 if (command == "y") {
-                    stop()
-                } else if (command == "n") {
                     # Do nothing
+                } else if (command == "n") {
+                    stop()
                 } else {
                     stop("You inputted something other than [y/n] in the prompt")
                 }
@@ -124,11 +123,11 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
         # conversion by reference on that copy, then return the copy. If data
         # is not a data.table (though it should be, otherwise there is no good
         # reason to set ref to FALSE) do data.frame conversion.
-        if (inherits(data, "data.table") & isPackageInstalled("data.table")) {
+        if (inherits(data, "data.table")) {
             
             # Make a copy of data, change the names using setnames() to avoid
             # warnings from data.table
-            data <- copy(data)
+            data <- data.table::copy(data)
             setnames(data, names(data), col_names)
             
         } else {
@@ -136,14 +135,13 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
             names(data) <- col_names
         }
         
-    } else if ("data.table" %in% class(data) & 
-                   isPackageInstalled("data.table")) {
+    } else if ("data.table" %in% class(data)) {
         
         ## If data is a data.table ---------------------------------------------
         
-        setnames(data, names(data), col_names)
+        data.table::setnames(data, names(data), col_names)
         message(data_name, " modified by reference b/c it is a data.table, and",
-                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                " ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
         
     } else {
@@ -154,10 +152,5 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
     }
     
     # Return the data
-    if (invisible == TRUE) {
-        return(invisible(data))
-        
-    } else {
-        return(data)
-    }
+    return(data)
 }
