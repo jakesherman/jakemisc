@@ -158,7 +158,7 @@ changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
         
         # Message that data was modified by reference
         message(data_name, " modified by reference b/c it is a data.table, and",
-                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                " ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
         
     } else {

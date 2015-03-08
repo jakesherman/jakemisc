@@ -1,12 +1,11 @@
 #' changeColOrder()
 #'
-#' Changes a column name from one to another. Accepts both data frames and 
-#' data.tables. 
+#' Changes the order of columns by placing a specified column to the left of 
+#' another specified column.
 #' 
 #' This function uses seperate methods for data.tables and data.frames. By 
 #' default, data.tables will be modified by reference. To turn off this
-#' behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-#' will be invisibly returned.
+#' behavior, set \code{ref} to \code{FALSE}. 
 #' 
 #' @keywords change, col, column, order, column order, column ordering
 #' @param data a \code{data.frame} or \code{data.table} 
@@ -19,11 +18,9 @@
 #' @param ref TRUE (default) or FALSE, if TRUE and data is a data.table, modify 
 #' the data.table by reference (modifying-in-place), if FALSE, do not modify
 #' the data.table by reference, instead treat it like a data.frame (copy on
-#' modify). When combining this function with the magrittr package, use the
-#' \code{\%T>\%} operator before this function to modify-in-place.
+#' modify). 
 #' @param warnings TRUE (default) or FALSE, should warnings occur when 
 #' modifications by reference occur or conversions take place?
-#' @param invisible TRUE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
@@ -32,8 +29,7 @@
 #' 
 #' \code{changeColOrder(my_data, "Jake", "Josh")}
 
-changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE, 
-                           invisible = TRUE) {
+changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
     
     ## Get all of the column name changes we are doing -------------------------
     
@@ -67,6 +63,12 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE,
     
     # If arguments are missing
     if (is.null(data)) stop("Requires argument for data")
+    
+    # If data isn't a data.frame, get outta here
+    if (!(is.data.frame(data))) {
+        stop("The data argument must be a data.frame (or data.table), or ",
+             "inherit data.frame")
+    }
     
     ## Get a vector of new column names ----------------------------------------
     
@@ -153,25 +155,24 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE,
         # conversion by reference on that copy, then return the copy. If data
         # is not a data.table (though it should be, otherwise there is no good
         # reason to set ref to FALSE) do data.frame conversion.
-        if ("data.table" %in% class(data) & isPackageInstalled("data.table")) {
+        if ("data.table" %in% class(data)) {
             
             # Make a copy of data, change the names using setnames() to avoid
             # warnings from data.table
-            data <- copy(data)
-            setnames(data, names(data), col_names)
+            data <- data.table::copy(data)
+            data.table::setnames(data, names(data), col_names)
             
         } else {
             names(data) <- col_names
         }
         
-    } else if ("data.table" %in% class(data) & 
-                   isPackageInstalled("data.table")) {
+    } else if ("data.table" %in% class(data)) {
         
         ## If data is a data.table ---------------------------------------------
         
-        setnames(data, names(data), col_names)
+        data.table::setnames(data, names(data), col_names)
         message(data_name, " modified by reference b/c it is a data.table, and",
-                "ref is set to TRUE by default. Set ref to FALSE to disable ",
+                " ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
         
     } else {
@@ -182,10 +183,5 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE,
     }
     
     # Return the data
-    if (invisible == TRUE) {
-        return(invisible(data))
-        
-    } else {
-        return(data)
-    }
+    return(data)
 }

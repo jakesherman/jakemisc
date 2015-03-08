@@ -1,8 +1,8 @@
 #' changeColName()
 #'
-#' Changes a column name from one to another. Accepts both \code{data frame} and 
-#' \code{data.table} inputs. Multiple column names can be changed with the simple 
-#' syntax \code{old_column_name/new_column_name}.
+#' Changes a column name. Accepts both \code{data frame} and  \code{data.table} 
+#' inputs. Multiple column names can be changed with the simple syntax 
+#' \code{old_column_name/new_column_name}.
 #' 
 #' This function uses seperate methods for data.tables and data.frames. By 
 #' default, data.tables will be modified by reference. To turn off this
@@ -22,7 +22,6 @@
 #' modify). 
 #' @param warnings TRUE (default) or FALSE, should warnings occur when 
 #' modifications by reference occur or conversions take place?
-#' @param invisible TRUE (by default), invisibly return the data?
 #' @export
 #' @examples
 #' 
@@ -30,9 +29,9 @@
 #' into one named "Josh":
 #' 
 #' \code{changeColName(my_data, "Jake", "Josh")}
+#' \code{changeColName(my_data, Jake/Josh, ref = FALSE, warnings = FALSE)}
 
-changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
-                          invisible = TRUE) {
+changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
     
     # NSE to get name of data
     data_name <- deparse(substitute(data))
@@ -58,6 +57,12 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
     
     # If arguments are missing
     if (is.null(data)) stop("Requires argument for data")
+    
+    # If data isn't a data.frame, get outta here
+    if (!(is.data.frame(data))) {
+        stop("The data argument must be a data.frame (or data.table), or ",
+             "inherit data.frame")
+    }
     
     ## Get a vector of new column names ----------------------------------------
     
@@ -90,14 +95,24 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE,
             if (warnings & interactive()) {
                 
                 cat("Your desired_colname is already a column name. Would you ",
-                    "still like to change your column name? [y/n]")
+                    "like to use a different desired_colname? [y/n]")
                 command <- scan(what = character(), n = 1, quiet = TRUE) 
                 
                 # Modify the install variable based on user input
                 if (command == "y") {
-                    # Do nothing
+                    
+                    cat("Please enter your new desired_colname, or press enter",
+                        " to stop the function ['name'/ENTER to end]")
+                    new_name <- scan(what = character(), quiet = TRUE)
+                    
+                    if (length(new_name) == 0) {
+                        stop()
+                    } else {
+                        desired_colname <- new_name
+                    }
+                    
                 } else if (command == "n") {
-                    stop()
+                    # Do nothing
                 } else {
                     stop("You inputted something other than [y/n] in the prompt")
                 }
