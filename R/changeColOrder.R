@@ -31,6 +31,9 @@
 
 changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
     
+    # NSE to get name of data
+    data_name <- deparse(substitute(data))
+    
     ## Get all of the column name changes we are doing -------------------------
     
     # Use NSE to turn ... into a character vector
@@ -41,20 +44,20 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
     lorder_changes <- NULL
     rorder_changes <- NULL
     
-    # If length of ... is 2 and no > or < is present, treat it as one order 
-    # change (left), otherwise we have one or more order changes via > and <
-    if (length(order_changes) == 2 & all(grepl(">", order_changes)) &
-            all(grepl("<", order_changes))) {
+    # If length of ... is 2 and no / or $ is present, treat it as one order 
+    # change (left), otherwise we have one or more order changes via / and $
+    if (length(order_changes) == 2 & all(grepl("/", order_changes)) &
+            all(grepl("\\$", order_changes))) {
         
         order_changes_list[[1]] <- c(order_changes[1], order_changes[2])
         
     } else {
         
-        # Seperate into previous and future orders using > and <
-        lorder_changes <- order_changes[grepl(">", order_changes)]
-        rorder_changes <- order_changes[grepl("<", order_changes)]
-        lorder_changes_list <- lapply(lorder_changes, seperateSymbol, ">")
-        rorder_changes_list <- lapply(rorder_changes, seperateSymbol, "<")
+        # Seperate into previous and future orders using / and $
+        lorder_changes <- order_changes[grepl("/", order_changes)]
+        rorder_changes <- order_changes[grepl("\\$", order_changes)]
+        lorder_changes_list <- lapply(lorder_changes, seperateSymbol, "/")
+        rorder_changes_list <- lapply(rorder_changes, seperateSymbol, "\\$")
         order_changes_list <- c(lorder_changes_list, rorder_changes_list)
         order_changes <- c(lorder_changes, rorder_changes)
     }
@@ -122,7 +125,7 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
         
         first_col <- order_changes_list[[i]][1]
         second_col <- order_changes_list[[i]][2]
-        isLeftArrow <- grepl(">", order_changes[i])
+        isLeftArrow <- grepl("/", order_changes[i])
         
         ## Error handling for each case --------------------
         
@@ -143,7 +146,7 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
         }
     }
     
-    ## Do the column name changing ---------------------------------------------
+    ## Do the column order changing ---------------------------------------------
     
     # Change the column names(varies if we have a data.table or
     # a data.frame)]
@@ -160,17 +163,17 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
             # Make a copy of data, change the names using setnames() to avoid
             # warnings from data.table
             data <- data.table::copy(data)
-            data.table::setnames(data, names(data), col_names)
+            data.table::setcolorder(data, col_names)
             
         } else {
-            names(data) <- col_names
+            data <- data[col_names]
         }
         
     } else if ("data.table" %in% class(data)) {
         
         ## If data is a data.table ---------------------------------------------
         
-        data.table::setnames(data, names(data), col_names)
+        data.table::setcolorder(data, col_names)
         message(data_name, " modified by reference b/c it is a data.table, and",
                 " ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
@@ -179,7 +182,7 @@ changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
         
         ## If data is a data.frame --------------------------------------------- 
         
-        names(data) <- col_names
+        data <- data[col_names]
     }
     
     # Return the data

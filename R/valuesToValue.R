@@ -45,6 +45,9 @@
 valuesToValue <- function(data = NULL, values = NULL, valueToConvertTo = NULL, 
                        onlyConvert = NULL, noConvert = NULL, ref = TRUE) {
     
+    # NSE to get name of data
+    data_name <- deparse(substitute(data))
+    
     ## Error handling ----------------------------------------------------------
     
     # Missing arguments
