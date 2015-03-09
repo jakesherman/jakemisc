@@ -217,8 +217,8 @@ delimitedToLong <- function(data, longThis, byThis, delimiter = ", ",
     
     # Change the class of longThis if requested
     if (!is.null(longThisClass)) {
-        changeColClass(myTable, class(myTable$longThis), longThisClass,
-                       onlyConvert = longThis)
+        jakemisc::changeColClass(myTable, class(myTable$longThis), longThisClass,
+                                 onlyConvert = longThis)
     }
     
     # If keepCols isn't NULL, join those columns on the new data

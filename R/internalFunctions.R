@@ -47,6 +47,56 @@ NSEtoVector <- function(..., USE.NAMES = FALSE) {
     return(package_names)
 }
 
+# Turn one or more NSE names (...) into a character vector, removing " marks
+NSEtoVector_ <- function(..., USE.NAMES = FALSE) {
+    
+    # Concatenate the package names together via non-standard evaluation
+    # (NSE) so quotes do not need to be placed around package names
+    vectors <- sapply(substitute(...()), deparse)
+    
+    # Function for taking quotes out of vectors
+    removeQuotes <- function(vectors) {
+        
+        vectors <- sapply(vectors, function(f) {
+            if (f == "NA") f <- NA
+            if (f == "NaN") f <- NaN
+            if (grepl("\"", f)) f <- gsub("\"", "", f)
+            return(f)
+        }, USE.NAMES = USE.NAMES)
+        
+        return(vectors)
+    }
+    
+    # If length of ... is 1, evaluate any c() functions
+    if (length(vectors) == 1) {
+        
+        if (grepl("c\\(", vectors)) {
+            vectors <- eval(parse(text = vectors))
+            
+        } else if (vectors == "NULL") {
+            vectors <- NULL
+            
+        } else if (vectors == "NA") {
+            vectors <- NA
+            
+        } else if (vectors == "NaN") {
+            vectors <- NaN
+            
+        } else {
+            
+            # Remove escaped quotation marks
+            vectors <- removeQuotes(vectors)
+        }
+        
+    } else {
+     
+        # Remove escaped quotation marks
+        vectors <- removeQuotes(vectors)  
+    }
+    
+    return(vectors)
+}
+
 # Given a string a symbol, return the position of the symbol w/i the string
 getSymbolPosition <- function(string, symbol) {
     return(gregexpr(symbol, string)[[1]][1])
