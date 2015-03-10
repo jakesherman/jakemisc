@@ -32,14 +32,19 @@
 #' \code{changeColName(my_data, Jake/Josh, ref = FALSE, warnings = FALSE)}
 
 changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
+    changeColName_(data, NSEtoVector(...), ref = ref, warnings = warnings)
+}
+
+#' @export
+changeColName_ <- function(data, ..., ref = TRUE, warnings = TRUE) {
     
     # NSE to get name of data
     data_name <- deparse(substitute(data))
     
     ## Get all of the column name changes we are doing -------------------------
     
-    # Use NSE to turn ... into a character vector
-    name_changes <- NSEtoVector(...)
+    # Get elements of ...
+    name_changes <- c(...)
     name_changes_list <- list()
     
     # If length of ... is 2 and no / is present, treat it as one name change, 
@@ -144,10 +149,12 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
             # warnings from data.table
             data <- data.table::copy(data)
             setnames(data, names(data), col_names)
+            return(data)
             
         } else {
             
             names(data) <- col_names
+            return(data)
         }
         
     } else if ("data.table" %in% class(data)) {
@@ -158,14 +165,13 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
         message(data_name, " modified by reference b/c it is a data.table, and",
                 " ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
+        return(invisible(data))
         
     } else {
         
         ## If data is a data.frame --------------------------------------------- 
         
         names(data) <- col_names
+        return(data)
     }
-    
-    # Return the data
-    return(data)
 }

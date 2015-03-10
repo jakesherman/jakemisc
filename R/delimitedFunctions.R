@@ -70,16 +70,13 @@ longToDelimited <- function(data, delimitThis, byThis, delimiter = ", ",
     if (allCols) {
         if (!is.null(keepCols)) message("keepCols being overwritten as you ",
                                         "specified allCols to be TRUE")
-        keepCols <- tableNames[!tableNames %in% c(longThis, byThis)]
+        keepCols <- tableNames[!tableNames %in% c(delimitThis, byThis)]
     }
     
     # Delete all unnecessary columns
     deleteThese <- tableNames[!tableNames %in% c(delimitThis, byThis, 
                                                  keepCols)]
-    myTable[, c(deleteThese) := NULL]
-    
-    # Change column ordering, so order is byThis, longThis, ...
-    data.table::setcolorder(myTable, c(byThis, delimitThis, keepCols))
+    if (length(deleteThese) != 0) myTable[, c(deleteThese) := NULL]
     
     # Create the delimited field
     evalFun <- parse(text = paste0("Delimit := paste(", delimitThis,
@@ -90,8 +87,15 @@ longToDelimited <- function(data, delimitThis, byThis, delimiter = ", ",
     dupCol <- parse(text = paste0("!duplicated(", byThis, ")"))
     myTable <- myTable[eval(dupCol)]
     
-    # Add correct column names
+    # Delete delimitThis, and change the name of the "Delimit" column to be the
+    # name of the now deleted delimitThis column - now, all col names are good
     myTable[, c(delimitThis) := NULL]
+    jakemisc::changeColName_(myTable, "Delimit", delimitThis)
+    
+    # Change the name of Delimit to delimitThis
+    
+    # Change the order of columns
+    data.table::setcolorder(myTable, c(byThis, "Delimit", keepCols))
     data.table::setnames(myTable, c(byThis, delimitThis, keepCols))
     
     ## Return the new data ------------------------------------------------------

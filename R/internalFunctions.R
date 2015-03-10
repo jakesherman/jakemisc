@@ -50,16 +50,18 @@ NSEtoVector <- function(..., USE.NAMES = FALSE) {
 # Turn one or more NSE names (...) into a character vector, removing " marks
 NSEtoVector_ <- function(..., USE.NAMES = FALSE) {
     
-    # Concatenate the package names together via non-standard evaluation
-    # (NSE) so quotes do not need to be placed around package names
+    # Concatenate ... together via non-standard evaluation (NSE) so quotes do 
+    # not need to be placed elements of ...
     vectors <- sapply(substitute(...()), deparse)
     
     # Function for taking quotes out of vectors
-    removeQuotes <- function(vectors) {
+    removeQuotes <- function(vectors, USE.NAMES = FALSE) {
         
         vectors <- sapply(vectors, function(f) {
             if (f == "NA") f <- NA
             if (f == "NaN") f <- NaN
+            if (f == "TRUE" & is.logical(f)) f <- TRUE
+            if (f == "FALSE" & is.logical(f)) f <- FALSE
             if (grepl("\"", f)) f <- gsub("\"", "", f)
             return(f)
         }, USE.NAMES = USE.NAMES)
@@ -85,13 +87,13 @@ NSEtoVector_ <- function(..., USE.NAMES = FALSE) {
         } else {
             
             # Remove escaped quotation marks
-            vectors <- removeQuotes(vectors)
+            vectors <- removeQuotes(vectors, USE.NAMES = USE.NAMES)
         }
         
     } else {
      
         # Remove escaped quotation marks
-        vectors <- removeQuotes(vectors)  
+        vectors <- removeQuotes(vectors, USE.NAMES = USE.NAMES)  
     }
     
     return(vectors)
@@ -109,4 +111,11 @@ seperateSymbol <- function(string, symbol) {
     after_symbol <- substr(string, (symbolPosition + 1), 
                    nchar(string))
     return(c(before_symbol, after_symbol))
+}
+
+# Return the column order of a subset of columns from a data.frame
+subsetColOrder <- function(data, subset_cols) {
+    subset_order <- sapply(subset_cols, grep, colnames(data), 
+                           USE.NAMES = FALSE)
+    return(order(subset_order))
 }
