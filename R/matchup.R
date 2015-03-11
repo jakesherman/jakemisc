@@ -45,15 +45,22 @@
 #' And the result is a vector: ("Massachusetts", "Califorina", "New York")
 
 matchup <- function(require_matches, matching_data, match_this, to_this) {
+    matchup_(require_matches, matching_data, NSEtoVector(match_this),
+             NSEtoVector(to_this))
+}
+
+#' @export
+#' @rdname matchup
+matchup_ <- function(require_matches, matching_data, match_this, to_this) {
     
     # Error handling
-    if(is.null(require_matches)) stop("Please enter the a vector of ele ",
-                                      "ments that need to be matched.")
-    if(is.null(matching_data)) stop("Please enter a data frame that ",
-                                    "contains the columns we need to ",
-                                    "match.")
-    if(is.null(match_this)) stop("Please enter the match_this argument")
-    if(is.null(to_this)) stop("Please enter the to_this argument")
+    if (is.null(require_matches)) stop("Please enter the a vector of ele ",
+                                       "ments that need to be matched.")
+    if (is.null(matching_data)) stop("Please enter a data frame that ",
+                                     "contains the columns we need to ",
+                                     "match.")
+    if (is.null(match_this)) stop("Please enter the match_this argument")
+    if (is.null(to_this)) stop("Please enter the to_this argument")
     
     # Use the supplied column names to subset the supplied data frame to 
     # generate vectors
@@ -106,11 +113,11 @@ matchup <- function(require_matches, matching_data, match_this, to_this) {
 createMatchup <- function(matching_data, match_this, to_this) {
     
     # Error handling (parent)
-    if(is.null(matching_data)) stop("Please enter a data frame that ",
+    if (is.null(matching_data)) stop("Please enter a data frame that ",
                                     "contains the columns we need to ",
                                     "match.")
-    if(is.null(match_this)) stop("Please enter the match_this argument")
-    if(is.null(to_this)) stop("Please enter the to_this argument")
+    if (is.null(match_this)) stop("Please enter the match_this argument")
+    if (is.null(to_this)) stop("Please enter the to_this argument")
     
     function(require_matches) {
         

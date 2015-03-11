@@ -36,7 +36,15 @@ changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
 }
 
 #' @export
+#' @rdname changeColName
 changeColName_ <- function(data, ..., ref = TRUE, warnings = TRUE) {
+    UseMethod("changeColName_")
+}
+
+## Methods for changeColName_ ---------------------------------------------------
+
+#' @export
+changeColName_.data.table <- function(data, ..., ref = TRUE, warnings = TRUE) {
     
     # NSE to get name of data
     data_name <- deparse(substitute(data))
@@ -133,45 +141,118 @@ changeColName_ <- function(data, ..., ref = TRUE, warnings = TRUE) {
     
     ## Do the column name changing ---------------------------------------------
     
-    # Change the column names(varies if we have a data.table or
-    # a data.frame)]
     if (ref == FALSE) {
         
-        ## If ref is set to FALSE from its default of TRUE ---------------------
+        # Make a copy of data, change the names using setnames() to avoid
+        # warnings from data.table
         
-        # If data is a data.table, create an explicit copy of data, do the 
-        # conversion by reference on that copy, then return the copy. If data
-        # is not a data.table (though it should be, otherwise there is no good
-        # reason to set ref to FALSE) do data.frame conversion.
-        if (inherits(data, "data.table")) {
-            
-            # Make a copy of data, change the names using setnames() to avoid
-            # warnings from data.table
-            data <- data.table::copy(data)
-            setnames(data, names(data), col_names)
-            return(data)
-            
-        } else {
-            
-            names(data) <- col_names
-            return(data)
-        }
+        data <- data.table::copy(data)
+        setnames(data, names(data), col_names)
+        return(data)
         
-    } else if ("data.table" %in% class(data)) {
-        
-        ## If data is a data.table ---------------------------------------------
+    } else {
         
         data.table::setnames(data, names(data), col_names)
         message(data_name, " modified by reference b/c it is a data.table, and",
                 " ref is set to TRUE by default. Set ref to FALSE to disable ",
                 "this behavior.")
+        
         return(invisible(data))
+    } 
+}
+
+#' @export
+changeColName_.data.frame <- function(data, ..., ref = TRUE, warnings = TRUE) {
+    
+    # NSE to get name of data
+    data_name <- deparse(substitute(data))
+    
+    ## Get all of the column name changes we are doing -------------------------
+    
+    # Get elements of ...
+    name_changes <- c(...)
+    name_changes_list <- list()
+    
+    # If length of ... is 2 and no / is present, treat it as one name change, 
+    # otherwise we have one or more name changes that use forward slashes
+    if (length(name_changes) == 2 & !all(grepl("/", name_changes))) {
+        name_changes_list[[1]] <- c(name_changes[1], name_changes[2])
         
     } else {
         
-        ## If data is a data.frame --------------------------------------------- 
-        
-        names(data) <- col_names
-        return(data)
+        # Seperate into previous and future colname using /
+        name_changes_list <- lapply(name_changes, seperateSymbol, "/")
     }
+    
+    ## Error handling ----------------------------------------------------------
+    
+    # If arguments are missing
+    if (is.null(data)) stop("Requires argument for data")
+    
+    ## Get a vector of new column names ----------------------------------------
+    
+    # Get new column names
+    newColNames <- function(col_names, current_colname, desired_colname) {
+        col_names[col_names == current_colname] <- desired_colname
+        return(col_names)
+    }
+    
+    # Get an updated character vector of column names based on the inputted 
+    # column name changes
+    col_names <- names(data)
+    for (i in seq_along(name_changes_list)) {
+        
+        ## Get the current and desired column names ---------------
+        
+        current_colname <- name_changes_list[[i]][1]
+        desired_colname <- name_changes_list[[i]][2]
+        
+        ## Error handling for each case --------------------
+        
+        # If current_colname isn't actually a column in data
+        if (!(current_colname %in% names(data))) {
+            stop("Your current_colname argument doesn't match any column ",
+                 "names of your data argument. Please check your spelling.")
+        }
+        
+        # If desired_colname is already a column name
+        if (desired_colname %in% names(data)) {
+            if (warnings & interactive()) {
+                
+                cat("Your desired_colname is already a column name. Would you ",
+                    "like to use a different desired_colname? [y/n]")
+                command <- scan(what = character(), n = 1, quiet = TRUE) 
+                
+                # Modify the install variable based on user input
+                if (command == "y") {
+                    
+                    cat("Please enter your new desired_colname, or press enter",
+                        " to stop the function ['name'/ENTER to end]")
+                    new_name <- scan(what = character(), quiet = TRUE)
+                    
+                    if (length(new_name) == 0) {
+                        stop()
+                    } else {
+                        desired_colname <- new_name
+                    }
+                    
+                } else if (command == "n") {
+                    # Do nothing
+                } else {
+                    stop("You inputted something other than [y/n] in the prompt")
+                }
+                
+            } else if (warnings) {
+                warning("desired_colname is already a column name")
+            }
+        }
+        
+        # Update col_names 
+        col_names <- newColNames(col_names, current_colname, desired_colname)
+    }
+    
+    ## Do the column name changing ----------------------------------------------
+    
+    names(data) <- col_names
+    return(data) 
 }
