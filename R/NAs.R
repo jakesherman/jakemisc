@@ -88,7 +88,7 @@ NAs.default <- function(data, type = "number", digits = 2) {
         NAs <- sumNAs(data)
         
     } else if (type == "percent") {
-        NAs <- round(sumNAs(data)/length(data), digits = digits)
+        NAs <- round(sumNAs(data) / length(data), digits = digits)
         
     } else {
         stop("Invalid type argument")
@@ -174,7 +174,7 @@ NaNs.default <- function(data, type = "number", digits = 2) {
         NaNs <- sumNaNs(data)
         
     } else if (type == "percent") {
-        NaNs <- round(sumNaNs(data)/length(data), digits = digits)
+        NaNs <- round(sumNaNs(data) / length(data), digits = digits)
         
     } else {
         stop("Invalid type argument")
@@ -186,8 +186,8 @@ NaNs.default <- function(data, type = "number", digits = 2) {
 #' NonNAs()
 #'
 #' Returns the number of Non-NAs in an object by column (for data.frames and 
-#' matricies) or just the number of Non-NAs (for all other objects). You may also
-#' set the type argument to \code{"percent"} to see the percent of Non-NAs.
+#' matricies) or just the number of Non-NAs (for all other objects). You may 
+#' also set the type argument to \code{"percent"} to see the percent of Non-NAs.
 #' 
 #' @keywords NA, NAs, percent, valid, missing, data, gone
 #' @param data an object, can be a data.frame (see Non-NAs by column), matrix 
@@ -261,7 +261,7 @@ NonNAs.default <- function(data, type = "number", digits = 2) {
         NonNAs <- sumNonNAs(data)
         
     } else if (type == "percent") {
-        NonNAs <- round(sumNonNAs(data)/length(data), digits = digits)
+        NonNAs <- round(sumNonNAs(data) / length(data), digits = digits)
         
     } else {
         stop("Invalid type argument")
