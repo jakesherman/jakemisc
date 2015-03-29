@@ -45,13 +45,6 @@
 #' And the result is a vector: ("Massachusetts", "Califorina", "New York")
 
 matchup <- function(require_matches, matching_data, match_this, to_this) {
-    matchup_(require_matches, matching_data, NSEtoVector(match_this),
-             NSEtoVector(to_this))
-}
-
-#' @export
-#' @rdname matchup
-matchup_ <- function(require_matches, matching_data, match_this, to_this) {
     
     # Error handling
     if (is.null(require_matches)) stop("Please enter the a vector of ele ",

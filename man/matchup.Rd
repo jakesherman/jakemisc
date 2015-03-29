@@ -2,12 +2,9 @@
 % Please edit documentation in R/matchup.R
 \name{matchup}
 \alias{matchup}
-\alias{matchup_}
 \title{matchup()}
 \usage{
 matchup(require_matches, matching_data, match_this, to_this)
-
-matchup_(require_matches, matching_data, match_this, to_this)
 }
 \arguments{
 \item{require_matches}{a character vector of elements that need to be matched}

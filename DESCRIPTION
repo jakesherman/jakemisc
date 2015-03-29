@@ -1,6 +1,6 @@
 Package: jakemisc
 Title: A set of misc. functions from Jake Sherman.
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: "Jake Sherman <jake@jakesherman.com> [aut, cre]"
 Description: A set of misc. functions from Jake Sherman.
 Depends:
