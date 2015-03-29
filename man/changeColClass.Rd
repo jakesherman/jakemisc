@@ -5,7 +5,7 @@
 \title{changeColClass()}
 \usage{
 changeColClass(data = NULL, startingClass = NULL, finalClass = NULL,
-  onlyConvert = NULL, noConvert = NULL, ref = TRUE, invisible = TRUE)
+  onlyConvert = NULL, noConvert = NULL, ref = TRUE)
 }
 \arguments{
 \item{data}{a \code{data.frame} or \code{data.table}}
@@ -14,30 +14,32 @@ changeColClass(data = NULL, startingClass = NULL, finalClass = NULL,
 
 \item{finalClass}{the column type you want to convert startingClass into}
 
-\item{onlyConvert}{optional - specify a vector of one or more column names
+\item{onlyConvert}{OPTIONAL - specify a vector of one or more column names
 as the only columns where the class conversion will take place. You may
 either have this parameter satified, or the noConvert parameter specified,
 you may not specify both.}
 
-\item{noConvert}{optional - specify a vector of one or more columns names
+\item{noConvert}{OPTIONAL - specify a vector of one or more columns names
 that you do not want any conversion applied to. You may either have this
 parameter satified, or the noConvert parameter specified, you may not
 specify both.}
 
-\item{invisible}{TRUE (by default), invisibly return the data?}
+\item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
+the data.table by reference (modifying-in-place), if FALSE, do not modify
+the data.table by reference, instead treat it like a data.frame (copy on
+modify).}
 }
 \description{
 Changes the class of columns from one class to another class, ex. change all
 columns of class factor into columns of class character. Works on both
-\code{data.frames} and \code{data.tables}. You may also specify either
+\code{data.frame} and \code{data.table} classes. You may also specify either
 a) specific columns to do this conversion on, or alternatively b) specific
-columns that you do not want converted.
+columns that you do not want conversion performed on.
 }
 \details{
 This function uses seperate methods for data.tables and data.frames. By
 default, data.tables will be modified by reference. To turn off this
-behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-will be invisibly returned.
+behavior, set \code{ref} to \code{FALSE}.
 }
 \examples{
 \\code{changeColClass(my_data, "factor", "character")}
@@ -47,11 +49,13 @@ will be invisibly returned.
                      noConvert = "special_col")}
 }
 \keyword{character,}
+\keyword{class}
 \keyword{convert,}
 \keyword{data,}
+\keyword{data.frame,}
 \keyword{data.table,}
 \keyword{factor,}
-\keyword{frame}
+\keyword{frame,}
 \keyword{numeric,}
 \keyword{table,}
 

@@ -2,9 +2,12 @@
 % Please edit documentation in R/packages.R
 \name{packages}
 \alias{packages}
+\alias{packages_}
 \title{packages()}
 \usage{
 packages(..., install = TRUE, results = FALSE, order = "ascending")
+
+packages_(..., install = TRUE, results = FALSE, order = "ascending")
 }
 \arguments{
 \item{...}{one or more package names, each seperated by a comma. You do not

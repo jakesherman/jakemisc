@@ -2,14 +2,12 @@
 % Please edit documentation in R/changeColName.R
 \name{changeColName}
 \alias{changeColName}
+\alias{changeColName_}
 \title{changeColName()}
 \usage{
-<<<<<<< HEAD
-changeColName(data, current_colname = NULL, desired_colname = NULL,
-  ref = NULL, warnings = NULL)
-=======
-changeColName(data, ..., ref = TRUE, warnings = TRUE, invisible = TRUE)
->>>>>>> development
+changeColName(data, ..., ref = TRUE, warnings = TRUE)
+
+changeColName_(data, ..., ref = TRUE, warnings = TRUE)
 }
 \arguments{
 \item{data}{a \code{data.frame} or \code{data.table}}
@@ -28,29 +26,27 @@ modify).}
 
 \item{warnings}{TRUE (default) or FALSE, should warnings occur when
 modifications by reference occur or conversions take place?}
-
-\item{invisible}{TRUE (by default), invisibly return the data?}
 }
 \description{
-Changes a column name from one to another. Accepts both data frames and
-data.tables. Multiple column names can be changed with the simple syntax
+Changes a column name. Accepts both \code{data frame} and  \code{data.table}
+inputs. Multiple column names can be changed with the simple syntax
 \code{old_column_name/new_column_name}.
 }
 \details{
 This function uses seperate methods for data.tables and data.frames. By
 default, data.tables will be modified by reference. To turn off this
-behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-will be invisibly returned.
+behavior, set \code{ref} to \code{FALSE}.
 }
 \examples{
 Here is how to change a column name, where we change a column named "Jake"
 into one named "Josh":
 
 \\code{changeColName(my_data, "Jake", "Josh")}
+\\code{changeColName(my_data, Jake/Josh, ref = FALSE, warnings = FALSE)}
 }
-\keyword{crosswalk}
-\keyword{lookup,}
-\keyword{match,}
-\keyword{matchup,}
-\keyword{up,}
+\keyword{change,}
+\keyword{col,}
+\keyword{column,}
+\keyword{name,}
+\keyword{names}
 

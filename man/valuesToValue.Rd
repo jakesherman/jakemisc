@@ -5,11 +5,7 @@
 \title{valuesToValue()}
 \usage{
 valuesToValue(data = NULL, values = NULL, valueToConvertTo = NULL,
-<<<<<<< HEAD
-  onlyConvert = NULL, noConvert = NULL, ref = TRUE, warnings = TRUE)
-=======
-  onlyConvert = NULL, noConvert = NULL, ref = TRUE, invisible = TRUE)
->>>>>>> development
+  onlyConvert = NULL, noConvert = NULL, ref = TRUE)
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
@@ -32,37 +28,21 @@ specify both.}
 \item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
 the data.table by reference (modifying-in-place), if FALSE, do not modify
 the data.table by reference, instead treat it like a data.frame (copy on
-<<<<<<< HEAD
-modify). When combining this function with the magrittr package, use the
-\code{\%T>\%} operator before this function to modify-in-place.}
-
-\item{warnings}{TRUE (default) or FALSE, should warnings occur when
-modifications by reference occur or conversions take place?}
-=======
 modify).}
-
-\item{invisible}{TRUE (by default), invisibly return the data?}
->>>>>>> development
 }
 \description{
-Given a data.frame or data.table, turns selected values into a different value for
-specified columns. By default all columns are used, but you may specify the
-onlyConvert argument with a vector of one or more columns names and only do
-the conversion on these columns, or alternatively, specify the noConvert
-argument with a vector of one or more columns names that shouldnt have the
-conversion done on them. You may only choose to specify onlyConvert or
-noConvert, you may not specify both at the same time.
+Given a \code{data.frame} or \code{data.table}, turns selected values into
+a different value for specified columns. By default all columns are used, but
+you may specify the onlyConvert argument with a vector of one or more columns
+names and only do the conversion on these columns, or alternatively, specify
+the noConvert argument with a vector of one or more columns names that
+shouldnt have the conversion done on them. You may only choose to specify
+onlyConvert or noConvert, you may not specify both at the same time.
 }
 \details{
-<<<<<<< HEAD
-By default, modification by reference will occur for data.tables. To turn
-this off, set ref to FALSE. By default warnings is set to TRUE.
-=======
 This function uses seperate methods for data.tables and data.frames. By
 default, data.tables will be modified by reference. To turn off this
-behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-will be invisibly returned.
->>>>>>> development
+behavior, set \code{ref} to \code{FALSE}.
 }
 \examples{
 Lets say we want to convert "na" or -500 values into "jake" for only the

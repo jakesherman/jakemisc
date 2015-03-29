@@ -5,26 +5,39 @@
 #' set the type argument to \code{"percent"} to see the percent of NAs.
 #' 
 #' @keywords NA, NAs, percent, valid, missing, data, gone
-#' @param data a \code{data.frame} or \code{data.table} 
-#' @param type
+#' @param data an object, can be a data.frame (see NAs by column), matrix (also
+#' see NAs by column), or a vector
+#' @param type \code{"number"}  is the default, displaying the number of NAs. 
+#' You may also use \code{"percent"}  to see the percent of NAs
+#' @param digits the number of digits to round to when the type arguemnt is set
+#' to \code{"percent"} 
 #' @export
 #' @examples
+#' 
+#' To see the number of NAs either in total or by column, depending on the class
+#' of the object inputted:
+#' \code{NAs(my_data)}
+#' 
+#' Same as above, but now looking at the percent of NAs:
+#' \code{NAs(my_data, type = "percent")}
  
 NAs <- function(data, type, digits) {
     UseMethod("NAs")
 }
 
-# Data.frame method, works with data.table and dplyr classes
+# Not for export - function for summing NAs
+sumNAs <- function(f) sum(is.na(f))
+
+# Data.frame method, tested on data.table and dplyr table classes
 #' @export
 NAs.data.frame <- function(data, type = "number", digits = 2) {
     
     # Find NAs
     if (type == "number") {
-        NAs <- sapply(data, function(f) sum(is.na(f)))
+        NAs <- sapply(data, sumNAs)
         
     } else if (type == "percent") {
-        NAs <- round(sapply(data, function(f) sum(is.na(f))) / nrow(data), 
-                     digits = digits)
+        NAs <- round(sapply(data, sumNAs) / nrow(data), digits = digits)
         
     } else {
         stop("Invalid type argument")
@@ -40,12 +53,11 @@ NAs.matrix <- function(data, type = "number", digits = 2) {
     
     # Find NAs
     if (type == "number") {
-        NAs <- apply(data, 2, function(f) sum(is.na(f)))
+        NAs <- apply(data, 2, sumNAs)
         
     } else if (type == "percent") {
         
-        NAs <- round(apply(data, 2, function(f) sum(is.na(f))) / nrow(data), 
-                     digits = digits)
+        NAs <- round(apply(data, 2, sumNAs) / nrow(data), digits = digits)
         
     } else {
         stop("Invalid type argument")
@@ -65,10 +77,10 @@ NAs.default <- function(data, type = "number", digits = 2) {
     
     # Find NAs
     if (type == "number") {
-        NAs <- sum(is.na(data))
+        NAs <- sumNAs(data)
         
     } else if (type == "percent") {
-        NAs <- round(sum(is.na(data))/length(data), digits = digits)
+        NAs <- round(sumNAs(data)/length(data), digits = digits)
         
     } else {
         stop("Invalid type argument")

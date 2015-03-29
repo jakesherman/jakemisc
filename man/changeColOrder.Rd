@@ -4,7 +4,7 @@
 \alias{changeColOrder}
 \title{changeColOrder()}
 \usage{
-changeColOrder(data, ..., ref = TRUE, warnings = TRUE, invisible = TRUE)
+changeColOrder(data, ..., ref = TRUE, warnings = TRUE)
 }
 \arguments{
 \item{data}{a \code{data.frame} or \code{data.table}}
@@ -19,23 +19,19 @@ as many column names as you like in one function call.}
 \item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
 the data.table by reference (modifying-in-place), if FALSE, do not modify
 the data.table by reference, instead treat it like a data.frame (copy on
-modify). When combining this function with the magrittr package, use the
-\code{\%T>\%} operator before this function to modify-in-place.}
+modify).}
 
 \item{warnings}{TRUE (default) or FALSE, should warnings occur when
 modifications by reference occur or conversions take place?}
-
-\item{invisible}{TRUE (by default), invisibly return the data?}
 }
 \description{
-Changes a column name from one to another. Accepts both data frames and
-data.tables.
+Changes the order of columns by placing a specified column to the left of
+another specified column.
 }
 \details{
 This function uses seperate methods for data.tables and data.frames. By
 default, data.tables will be modified by reference. To turn off this
-behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-will be invisibly returned.
+behavior, set \code{ref} to \code{FALSE}.
 }
 \examples{
 Here is how to change a column name, where we change a column named "Jake"

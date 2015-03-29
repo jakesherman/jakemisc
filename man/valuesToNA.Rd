@@ -5,7 +5,7 @@
 \title{valuesToNA()}
 \usage{
 valuesToNA(data = NULL, values = NULL, onlyConvert = NULL,
-  noConvert = NULL, ref = TRUE, invisible = TRUE)
+  noConvert = NULL, ref = TRUE)
 }
 \arguments{
 \item{data}{a data frame/table that we want to remove NAs from}
@@ -26,29 +26,21 @@ specify both.}
 \item{ref}{TRUE (default) or FALSE, if TRUE and data is a data.table, modify
 the data.table by reference (modifying-in-place), if FALSE, do not modify
 the data.table by reference, instead treat it like a data.frame (copy on
-<<<<<<< HEAD
-modify). When combining this function with the magrittr package, use the
-\code{\%T>\%} operator before this function to modify-in-place.}
-=======
 modify).}
->>>>>>> development
-
-\item{invisible}{TRUE (by default), invisibly return the data?}
 }
 \description{
-Given a data.frame or data.table, turns selected values into NAs for
-specified columns. By default all columns are used, but you may specify the
-onlyConvert argument with a vector of one or more columns names and only do
-the NA conversion on these columns, or, alternatively, specify the noConvert
-argument with a vector of one or more columns names that shouldnt have the
-conversion done on them. You may only choose to specify onlyConvert or
-noConvert, you may not specify both at the same time.
+Given a \code{data.frame} or \code{data.table}, turns selected values into
+NAs for specified columns. By default all columns are used, but you may
+specify the onlyConvert argument with a vector of one or more columns names
+and only do the NA conversion on these columns, or, alternatively, specify
+the noConvert argument with a vector of one or more columns names that
+shouldnt have the conversion done on them. You may only choose to specify
+onlyConvert or noConvert, you may not specify both at the same time.
 }
 \details{
 This function uses seperate methods for data.tables and data.frames. By
 default, data.tables will be modified by reference. To turn off this
-behavior, set \code{ref} to \code{FALSE}. Resulting \code{data.frames/tables}
-will be invisibly returned.
+behavior, set \code{ref} to \code{FALSE}.
 }
 \examples{
 Lets say we want to convert "na" or -500 values into NAs for only the
@@ -56,12 +48,18 @@ columns "town" and "city" in the data.table my_data:
 \\code{valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
 
 Here is the same as above, but for a data.frame my_data:
-\\code{my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
+\\code{my_data <- valuesToNA(my_data, c("na", -500),
+onlyConvert = c("town", "city"))}
 
 Or, what if we want to convert "na" or -500 values into NAs for every
 columnn in my_data except for "town", "city", or "country":
-\\code{valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))}
+\\code{valuesToNA(my_data, c("na", -500), noConvert =
+c("town", "city", "country"))}
 }
-\keyword{NA}
+\keyword{NA,}
+\keyword{conversion,}
+\keyword{convert,}
+\keyword{value,}
+\keyword{values}
 \keyword{valuesToNA,}
 
