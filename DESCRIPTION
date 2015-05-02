@@ -1,6 +1,6 @@
 Package: jakemisc
 Title: A set of misc. functions from Jake Sherman.
-Version: 0.2.5
+Version: 0.2.6
 Authors@R: "Jake Sherman <jake@jakesherman.com> [aut, cre]"
 Description: A set of misc. functions from Jake Sherman.
 Depends:
@@ -8,7 +8,8 @@ Depends:
 Imports:
     data.table,
     devtools,
-    fastmatch
+    fastmatch,
+    magrittr
 Suggests:
     dplyr
 License: MIT License

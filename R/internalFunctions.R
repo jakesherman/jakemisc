@@ -119,3 +119,8 @@ subsetColOrder <- function(data, subset_cols) {
                            USE.NAMES = FALSE)
     return(order(subset_order))
 }
+
+# Detect if a numeric object is a whole number or not
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
+    abs(x - round(x)) < tol
+}
