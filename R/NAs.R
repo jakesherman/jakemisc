@@ -34,9 +34,6 @@ NAs <- function(data, type, digits) {
     UseMethod("NAs")
 }
 
-# Not for export - function for summing NAs
-sumNAs <- function(f) sum(is.na(f))
-
 # Data.frame method, tested on data.table and dplyr table classes
 #' @export
 NAs.data.frame <- function(data, type = "number", digits = 2) {
@@ -239,7 +236,8 @@ NonNAs.matrix <- function(data, type = "number", digits = 2) {
         
     } else if (type == "percent") {
         
-        NonNAs <- round(apply(data, 2, sumNonNAs) / nrow(data), digits = digits)
+        NonNAs <- round(apply(data, 2, sumNonNAs) / nrow(data), 
+                        digits = digits)
         
     } else {
         stop("Invalid type argument")

@@ -124,3 +124,6 @@ subsetColOrder <- function(data, subset_cols) {
 is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
     abs(x - round(x)) < tol
 }
+
+# Not for export - function for summing NAs
+sumNAs <- function(f) sum(is.na(f))
