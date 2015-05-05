@@ -26,9 +26,16 @@ namesIn <- function(names, df) {
     all(names %in% names(df))
 }
 
-assertthat::on_failure(is.data.table) <- function(call, env) {
+assertthat::on_failure(namesIn) <- function(call, env = parent.env) {
     paste0("One or more of the names in '", deparse(call$x), "' is not a name",
            " in the data.frame")
+}
+
+columnsToUse <- function(allCols, markedCols) {
+    
+    if (any(substr(markedCols, 1, 1) == "-")) {
+        
+    }
 }
 
 #' keepColsDT()
@@ -54,7 +61,6 @@ keepColsDT <- function(data = NULL, keepCols = NULL, silent = FALSE) {
     assertthat::assert_that(notNULL(data))
     assertthat::assert_that(notNULL(keepCols))
     assertthat::assert_that(is.data.table(data))
-    assertthat::assert_that(assertthat::not_empty(keepCols))
     assertthat::assert_that(namesIn(keepCols, data))
     
     # Figure out which columns to delete
