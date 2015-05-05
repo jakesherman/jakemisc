@@ -6,12 +6,13 @@
 factorToNumeric(factors)
 }
 \arguments{
-\item{a}{vector of factors}
+\item{factors}{a vector of factors}
 }
 \description{
 Turns factors into numerics.
 }
 \examples{
+factors <- factor(c(1.2, 4.2, 4.2, 3.4))
 factors <- factorToNumeric(factors)
 }
 \keyword{factor,}
