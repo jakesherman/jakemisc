@@ -3,7 +3,7 @@
 #' Turns factors into numerics. 
 #' 
 #' @keywords factor, numeric
-#' @param factors a vector of factors
+#' @param factors factors to convert to numeric
 #' @export
 #' @examples
 #' 
@@ -12,9 +12,10 @@
 
 factorToNumeric <- function(factors) {
     
-    # Error checking - is the input a factor? Is its length >= 1?
+    # Error handling
+    assertthat::assert_that(notNULL(factors))
     assertthat::assert_that(is.factor(factors))
-    assertthat::assert_that(length(factors) >= 1)
+    assertthat::assert_that(is.flag(intCheck))
     
     # Do the conversion
     as.numeric(as.character(factors))
@@ -36,23 +37,25 @@ factorToNumeric <- function(factors) {
 #' factors <- factor(c(1,2,3,4,5))
 #' factors <- factorToInteger(factors)
 
-factorToInteger <- function(factors, intCheck = TRUE) {
+factorToInteger <- function(factors = NULL, intCheck = TRUE) {
     
-    # Error checking - is the input a factor? Is its length >= 1?
+    # Error handling
+    assertthat::assert_that(notNULL(factors))
     assertthat::assert_that(is.factor(factors))
-    assertthat::assert_that(length(factors) >= 1)
+    assertthat::assert_that(is.flag(intCheck))
     
-    # Error checking - are the factors in fact whole numbers?
-    if (intCheck == TRUE) {
+    # Error handling - are the factors in fact whole numbers?
+    if (intCheck) {
         
-        # Randomly sample up to 50 numbers
-        if (length(factors) >= 50) {
+        # Randomly sample up to 50 non-NA numbers from factors
+        nonNAfactors <- na.omit(factors)
+        if (length(nonNAfactors) >= 50) {
             sampleSize <- 50
         } else {
-            sampleSize <- length(factors)
+            sampleSize <- length(nonNAfactors)
         }
         
-        sampledFactors <- sample(factors, sampleSize)
+        sampledFactors <- sample(nonNAfactors, sampleSize)
         
         # Convert the sampledFactors to numeric
         sampledFactors %<>% factorToNumeric()
