@@ -127,3 +127,18 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
 
 # Not for export - function for summing NAs
 sumNAs <- function(f) sum(is.na(f))
+
+# dplyr like column selection
+columnsToUse <- function(allCols, markedCols) {
+    
+    # Error handling
+    assertthat::assert_that(namesIn())
+    
+    if (substr(markedCols[1], 1, 1) == "-") {
+        # Delete these   
+    } else {
+        # Keep these
+    }
+    
+    # Have vector of columns to use
+}
