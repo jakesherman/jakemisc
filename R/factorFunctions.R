@@ -92,8 +92,11 @@ factorToInteger <- function(factors = NULL, intCheck = TRUE) {
             newFactors <- as.numeric(as.character(factors))
             
         } else {
-            newFactors <- as.integer(as.character(factors))
+            newFactors <- as.integer(as.character(factors)) 
         }
+        
+    } else {
+        newFactors <- as.integer(as.character(factors)) 
     }
     
     newFactors
