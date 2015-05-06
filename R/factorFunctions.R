@@ -1,3 +1,14 @@
+## ============================================================================
+##
+## Functions to coerse factors
+##
+## Background: base::as.numeric() and base::as.integer() operate on the levels
+## of factors, not the values themselves, which typically isn't what one
+## wants. Since the above functions are primitives, I thought it would be
+## best to just write new functions to do coersion from factors to numerics.
+##
+## ============================================================================
+
 #' factorToNumeric()
 #'
 #' Turns factors into numerics. 
@@ -15,7 +26,7 @@ factorToNumeric <- function(factors) {
     # Error handling
     assertthat::assert_that(notNULL(factors))
     assertthat::assert_that(is.factor(factors))
-    assertthat::assert_that(is.flag(intCheck))
+    assertthat::assert_that(assertthat::is.flag(intCheck))
     
     # Do the conversion
     as.numeric(as.character(factors))
@@ -42,7 +53,7 @@ factorToInteger <- function(factors = NULL, intCheck = TRUE) {
     # Error handling
     assertthat::assert_that(notNULL(factors))
     assertthat::assert_that(is.factor(factors))
-    assertthat::assert_that(is.flag(intCheck))
+    assertthat::assert_that(assertthat::is.flag(intCheck))
     
     # Error handling - are the factors in fact whole numbers?
     if (intCheck) {
