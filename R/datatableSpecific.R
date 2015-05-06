@@ -2,7 +2,46 @@
 ##
 ## Functions specific to the data.table package
 ##
+## Includes 1. data.table related functions not for export
+##          2. functions for export
+##
+## Assertations related to data.tables are in assertations.R
+##
 ## ============================================================================
+
+## data.table related functions not for export --------------------------------
+
+# Turns a vector of numerics or characters into essentially a NSE
+# version, where the input to the expression is returned, unevaluted
+vectorToParsedTxt <- function(vector, wrap = '"', collapse = ", ") {
+    paste0(wrap, vector, wrap) %>%
+        paste(collapse = collapse) %>%
+        paste0("c(", ., ")")
+}
+
+# Returns vectorToParsedTxt for a list of vectors. If the vector is
+# numeric, nothing is wrapped around the numbers, otherwise single quotes
+# are wrapped around the elements of each list/vector
+vectorsToParsedTxt <- function(listVectors) {
+    lapply(listVectors, function(f) {
+        ifelse(is.numeric(f), 
+               vectorToParsedTxt(f, wrap = ""),  # -- no wrap
+               vectorToParsedTxt(f, wrap = '"'))  # -- char wrap
+    })
+}
+
+# Turns a list of vectors into an unevaluated i expression in data.table
+# that will subset the data.table by the expression (note that keys must
+# already be set on the data.table for this to work)
+vectorsToParsedTxtDT <- function(listVectorsNSE) {
+    listVectorsNSE %>%
+        vectorsToParsedTxt() %>%
+        unlist() %>%
+        paste(collapse = ", ") %>%
+        paste0("list(", .,")")
+}
+
+## Functions for export -------------------------------------------------------
 
 #' keepColsDT()
 #'
@@ -224,30 +263,10 @@ subsetDT <- function(data, ..., ref = TRUE) {
     # Set the keys
     if (ref == FALSE) data <- data.table::copy(data)
     setkeyv(data, columns)
-    
-    # Vector to NSE function
-    vectorToNSE <- function(vector) {
-        paste0("c(", paste(paste0('"', vector, '"'), collapse = ", "), ")")
-    }
-    
-    # Vectors to NSE function
-    vectorsToNSE <- function(listVectors) {
-        lapply(listVectors, vectorToNSE)
-    }
-    
-    # Vectors to DT-ready NSE
-    vectorsToDTNSE <- function(listVectorsNSE) {
-        listVectorsNSE %>%
-            vectorsToNSE %>%
-            unlist() %>%
-            paste(collapse = ", ") %>%
-            paste0(".(", .,")")
-    }
-    
+
     # Get the expression
-    DTexpr <- vectorsToDTNSE(filters)
-    print(DTexpr %>% cat)
+    DTexpr <- vectorsToParsedTxtDT(filters)
     
     # Subset data
-    #data[eval(parse(text = DTexpr)), ]
+    data[eval(parse(text = DTexpr)), ]
 }
