@@ -45,7 +45,6 @@ factorToNumeric <- function(factors) {
     # Error handling
     assertthat::assert_that(notNULL(factors))
     assertthat::assert_that(is.factor(factors))
-    assertthat::assert_that(assertthat::is.flag(intCheck))
     
     # Do the conversion
     as.numeric(as.character(factors))
