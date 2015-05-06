@@ -1,11 +1,11 @@
-## =============================================================================
+## ============================================================================
 ##
 ## Various NAs functions - contains:
 ##     1) NAs()
 ##     2) NaNs()
 ##     3) NonNAs()
 ##
-## =============================================================================
+## ============================================================================
 
 #' NAs()
 #'
@@ -23,8 +23,8 @@
 #' @export
 #' @examples
 #' 
-#' To see the number of NAs either in total or by column, depending on the class
-#' of the object inputted:
+#' To see the number of NAs either in total or by column, depending on the 
+#' class of the object inputted:
 #' \code{NAs(my_data)}
 #' 
 #' Same as above, but now looking at the percent of NAs:
@@ -101,8 +101,8 @@ NAs.default <- function(data, type = "number", digits = 2) {
 #' set the type argument to \code{"percent"} to see the percent of NAs.
 #' 
 #' @keywords NaN, NaNs, percent, valid, missing, data
-#' @param data an object, can be a data.frame (see NaNs by column), matrix (also
-#' see NaNs by column), or a vector
+#' @param data an object, can be a data.frame (see NaNs by column), matrix 
+#' (also see NaNs by column), or a vector
 #' @param type \code{"number"}  is the default, displaying the number of NaNs. 
 #' You may also use \code{"percent"}  to see the percent of NaNs
 #' @param digits the number of digits to round to when the type arguemnt is set

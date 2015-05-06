@@ -13,10 +13,12 @@
 
 # Turns a vector of numerics or characters into essentially a NSE
 # version, where the input to the expression is returned, unevaluted
-vectorToParsedTxt <- function(vector, wrap = '"', collapse = ", ") {
-    paste0(wrap, vector, wrap) %>%
+vectorToParsedTxt <- function(vector, wrap = '"', collapse = ", ",
+                              concatenate = "c(", end = ")") {
+    vector %>%
+        paste0(wrap, ., wrap) %>%
         paste(collapse = collapse) %>%
-        paste0("c(", ., ")")
+        paste0(concatenate, ., end)
 }
 
 # Returns vectorToParsedTxt for a list of vectors. If the vector is
@@ -24,9 +26,13 @@ vectorToParsedTxt <- function(vector, wrap = '"', collapse = ", ") {
 # are wrapped around the elements of each list/vector
 vectorsToParsedTxt <- function(listVectors) {
     lapply(listVectors, function(f) {
-        ifelse(is.numeric(f), 
-               vectorToParsedTxt(f, wrap = ""),  # -- no wrap
-               vectorToParsedTxt(f, wrap = '"'))  # -- char wrap
+        if (is.numeric(f)) {
+            vectorToParsedTxt(f, wrap = "") 
+        } else if (is.factor(f)) {
+            vectorToParsedTxt(f, concatenate = "factor(c(", end = "))")
+        } else {
+            vectorToParsedTxt(f) 
+        }
     })
 }
 
@@ -39,6 +45,70 @@ vectorsToParsedTxtDT <- function(listVectorsNSE) {
         unlist() %>%
         paste(collapse = ", ") %>%
         paste0("list(", .,")")
+}
+
+# Function to create an S3 object: subsetObj
+subsetObj <- function(...) {
+    
+    # Put ... into a list
+    obj <- list(...)
+    
+    # Error handling - is the length of ... > 0
+    assertthat::assert_that(length(obj) > 0)
+    
+    # Error handling - does every element have a name?
+    if ("" %in% names(obj)) {
+        stop("Each element of the subsetObj needs to have a name that ",
+             "corresponds with a column name.")
+    }
+    
+    # Error handling - does each element have > 0 elements w/i?
+    if (all(vapply(obj, length, numeric(1)) == 0)) {
+        stop("Each element needs to have one or more items to subset on.")
+    }
+    
+    structure(obj, class = "subsetObj")
+}
+
+# Function for determining if an object is a subsetObj
+is.subsetObj <- function(obj) inherits(obj, "subsetObj")
+
+# Function for extracting column names from a subsetObj
+getSubsetCols <- function(subsetObj) {
+    UseMethod("getSubsetCols")
+}
+
+getSubsetCols.subsetObj <- function(subsetObj) {
+    names(subsetObj)
+}
+
+# Function for getting a data.table expression for a subsetObj
+getSubsetExpr <- function(subsetObj) {
+    UseMethod("getSubsetExpr")
+}
+
+getSubsetExpr.subsetObj <- function(subsetObj) {
+    vectorsToParsedTxtDT(subsetObj)
+}
+
+# keyMatch: determines if the keys in a data.table exactly match the a 
+# character vector of specified keys
+keyMatch <- function(data, keys) {
+    UseMethod("keyMatch")
+}
+
+keyMatch.data.table <- function(data, keys) {
+    dataKeys <- attributes(data)$sorted
+    ifelse(is.null(dataKeys), FALSE, identical(dataKeys, keys))
+}
+
+# hasKey: TRUE or FALSE, does a data.table have a key set?
+hasKey <- function(data) {
+    UseMethod("hasKey")
+}
+
+hasKey.data.table <- function(data) {
+    !is.null(attributes(data)$sorted)
 }
 
 ## Functions for export -------------------------------------------------------
@@ -181,7 +251,6 @@ mergeDT <- function(DT1 = NULL, DT2 = NULL, keys = NULL, keepCols = NULL,
     
     # Error handling - do DT1 and DT2 have identical keys? If not, the keys
     # argument must be supplied
-    
     DT1keys <- attributes(DT1)$sorted
     DT2keys <- attributes(DT2)$sorted
     
@@ -240,33 +309,34 @@ mergeDT <- function(DT1 = NULL, DT2 = NULL, keys = NULL, keepCols = NULL,
 #' a copy of data is made via \code{data.table::copy()}, leaving data
 #' unaffected by the key setting in subsetDT.
 #' @export
-#' @examples
 
 subsetDT <- function(data, ..., ref = TRUE) {
     
     # Error handling
     assertthat::assert_that(notNULL(data))
     assertthat::assert_that(is.DT(data))
-    assertthat::assert_that(length(c(...)) > 0)
     assertthat::assert_that(is.flag(ref))
     
-    # Handle the ...
-    args <- list(...)
-    columns <- lapply(args, function(f) f[[1]]) %>% unlist()
-    filters <- lapply(args, function(f) unlist(f[[2]]))
+    # Create a subset object if one wasn't passed to ...
+    obj <- subsetObj(...)
+    columns <- getSubsetCols(obj)
     
     # Are all of the columns in names(data)?
     if (!namesIn(columns, data)) {
         stop("One or more of your columns are not present in names(data).")
     }
     
-    # Set the keys
-    if (ref == FALSE) data <- data.table::copy(data)
-    setkeyv(data, columns)
+    # If keys matching the columns in ... exist, use those keys. If not, set
+    # keys. If ref == FALSE, make a data.table::copy of data, otherwise the
+    # keys will be set by reference.
+    if (!keyMatch(data, columns)) {
+        if (ref == FALSE) data <- data.table::copy(data)
+        setkeyv(data, columns)
+    }
 
     # Get the expression
-    DTexpr <- vectorsToParsedTxtDT(filters)
+    subsetExpr <- getSubsetExpr(obj)
     
     # Subset data
-    data[eval(parse(text = DTexpr)), ]
+    data[eval(parse(text = subsetExpr)), ]
 }
