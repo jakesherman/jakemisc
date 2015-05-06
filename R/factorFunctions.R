@@ -9,12 +9,31 @@
 ##
 ## ============================================================================
 
+## Functions not for export ---------------------------------------------------
+
+sampleUpTo <- function(x, size, prob = NULL) {
+    
+    # Arguments: a vector (x), sample size (size), and a vector of probability
+    #            weights from base::sample (prob)
+    # Outputs: Sampling of of size size from x without replacement, but if the
+    #          length of x is < the size argument, use length(x) as size
+    
+    if (length(x) < size) size <- length(x)
+    sample(x, size, replace = FALSE, prob = prob)
+}
+
+## Functions for export -------------------------------------------------------
+
 #' factorToNumeric()
 #'
 #' Turns factors into numerics. 
 #' 
 #' @keywords factor, numeric
 #' @param factors factors to convert to numeric
+#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%<>%"
+#' @importFrom magrittr "%T>%"
+#' @importFrom magrittr "%$%"
 #' @export
 #' @examples
 #' 
@@ -58,18 +77,11 @@ factorToInteger <- function(factors = NULL, intCheck = TRUE) {
     # Error handling - are the factors in fact whole numbers?
     if (intCheck) {
         
-        # Randomly sample up to 50 non-NA numbers from factors
+        # Randomly sample up to 50 non-NA numbers from factors and convert
+        # them to numerics
         nonNAfactors <- na.omit(factors)
-        if (length(nonNAfactors) >= 50) {
-            sampleSize <- 50
-        } else {
-            sampleSize <- length(nonNAfactors)
-        }
-        
-        sampledFactors <- sample(nonNAfactors, sampleSize)
-        
-        # Convert the sampledFactors to numeric
-        sampledFactors %<>% factorToNumeric()
+        sampledFactors <- sampleUpTo(nonNAfactors, 50) %>%
+            factorToNumeric()
         
         # If any of the sampledFactors are not whole numbers, use 
         # factorToNumeric instead and throw a warning
