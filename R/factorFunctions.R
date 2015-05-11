@@ -34,6 +34,8 @@ sampleUpTo <- function(x, size, prob = NULL) {
 #' @importFrom magrittr "%<>%"
 #' @importFrom magrittr "%T>%"
 #' @importFrom magrittr "%$%"
+#' @importFrom assertthat assert_that
+#' @importFrom assertthat is.flag
 #' @export
 #' @examples
 #' 
@@ -43,8 +45,8 @@ sampleUpTo <- function(x, size, prob = NULL) {
 factorToNumeric <- function(factors) {
     
     # Error handling
-    assertthat::assert_that(notNULL(factors))
-    assertthat::assert_that(is.factor(factors))
+    assert_that(notNULL(factors))
+    assert_that(is.factor(factors))
     
     # Do the conversion
     as.numeric(as.character(factors))
@@ -69,9 +71,9 @@ factorToNumeric <- function(factors) {
 factorToInteger <- function(factors = NULL, intCheck = TRUE) {
     
     # Error handling
-    assertthat::assert_that(notNULL(factors))
-    assertthat::assert_that(is.factor(factors))
-    assertthat::assert_that(assertthat::is.flag(intCheck))
+    assert_that(notNULL(factors))
+    assert_that(is.factor(factors))
+    assert_that(is.flag(intCheck))
     
     # Error handling - are the factors in fact whole numbers?
     if (intCheck) {
