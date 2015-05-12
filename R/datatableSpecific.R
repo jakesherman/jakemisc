@@ -54,7 +54,7 @@ subsetObj <- function(...) {
     obj <- list(...)
     
     # Error handling - is the length of ... > 0
-    assertthat::assert_that(length(obj) > 0)
+    assert_that(length(obj) > 0)
     
     # Error handling - does every element have a name?
     if ("" %in% names(obj)) {
@@ -121,7 +121,7 @@ hasKey.data.table <- function(data) {
 #' @keywords keep, columns, DT, data.table
 #' @param data a data.table
 #' @param keepCols a character vector of column names NOT to delete
-#' @param silent FALSE by default, if TRUE it turns off the messages that
+#' @param verbose TRUE by default, if FALSE it turns off the messages that
 #' appear after each column is deleted by reference.
 #' @export
 #' @examples
@@ -130,12 +130,13 @@ hasKey.data.table <- function(data) {
 #' mtcars <- data.table(mtcars)
 #' keepColsDT(mtcars, columnsToKeep)
 
-keepColsDT <- function(data = NULL, keepCols = NULL, silent = FALSE) {
+keepColsDT <- function(data = NULL, keepCols = NULL, verbose = TRUE) {
     
     # Error handling
-    assertthat::assert_that(notNULL(data))
-    assertthat::assert_that(notNULL(keepCols))
-    assertthat::assert_that(is.DT(data))
+    assert_that(notNULL(data))
+    assert_that(notNULL(keepCols))
+    assert_that(is.DT(data))
+    assert_that(is.flag(verbose))
     #assertthat::assert_that(namesIn(keepCols, data))
     if (!namesIn(keepCols, data)) {
         stop("One or more names in 'keepCols' is not present in names(data).")
@@ -152,10 +153,11 @@ keepColsDT <- function(data = NULL, keepCols = NULL, silent = FALSE) {
     }
     
     # Delete the columns
-    for (col in deleteCols) set(data, , col, NULL)
+    for (col in deleteCols) data.table::set(data, , col, NULL)
     
-    # Messages after each column is deleted
-    if (!silent & interactive()) {
+    # Messages after the columns have been deleted (happens so quickly that
+    # I don't think messages need to appear after each is deleted 1-by-1)
+    if (verbose & interactive()) {
         message(paste(deleteCols, collapse = ", "), " deleted by reference.")
     }
     
@@ -169,7 +171,7 @@ keepColsDT <- function(data = NULL, keepCols = NULL, silent = FALSE) {
 #' @keywords delete, columns, DT, data.table
 #' @param data a data.table
 #' @param deleteCols a character vector of column names o delete
-#' @param silent FALSE by default, if TRUE it turns off the messages that
+#' @param verbose TRUE by default, if FALSE it turns off the messages that
 #' appear after each column is deleted by reference.
 #' @export
 #' @examples
@@ -178,13 +180,14 @@ keepColsDT <- function(data = NULL, keepCols = NULL, silent = FALSE) {
 #' mtcars <- data.table(mtcars)
 #' deleteColsDT(mtcars, columnsToDelete)
 
-deleteColsDT <- function(data = NULL, deleteCols = NULL, silent = FALSE) {
+deleteColsDT <- function(data = NULL, deleteCols = NULL, verbose = TRUE) {
     
     # Error handling
-    assertthat::assert_that(notNULL(data))
-    assertthat::assert_that(notNULL(deleteCols))
-    assertthat::assert_that(is.DT(data))
-    assertthat::assert_that(assertthat::not_empty(deleteCols))
+    assert_that(notNULL(data))
+    assert_that(notNULL(deleteCols))
+    assert_that(is.DT(data))
+    assert_that(not_empty(deleteCols))
+    assert_that(is.flag(verbose))
     #assertthat::assert_that(namesIn(deleteCols, data))
     if (!namesIn(deleteCols, data)) {
         stop("One or more names in 'keepCols' is not present in names(data).")
@@ -194,10 +197,10 @@ deleteColsDT <- function(data = NULL, deleteCols = NULL, silent = FALSE) {
     }
     
     # Delete the columns
-    for (col in deleteCols) set(data, , col, NULL)
+    for (col in deleteCols) data.table::set(data, , col, NULL)
     
     # Messages after each column is deleted
-    if (!silent & interactive()) {
+    if (verbose & interactive()) {
         message(paste(deleteCols, collapse = ", "), " deleted by reference.")
     }
     
@@ -240,10 +243,10 @@ mergeDT <- function(DT1 = NULL, DT2 = NULL, keys = NULL, keepCols = NULL,
     # Outputs: a merged data.table (full join)
     
     # Error handling - are DT1 and DT2 valid?
-    assertthat::assert_that(notNULL(DT1))
-    assertthat::assert_that(notNULL(DT2))
-    assertthat::assert_that(is.DT(DT1))
-    assertthat::assert_that(is.DT(DT2))
+    assert_that(notNULL(DT1))
+    assert_that(notNULL(DT2))
+    assert_that(is.DT(DT1))
+    assert_that(is.DT(DT2))
     
     # Copy the data.tables
     DT1 <- data.table::copy(DT1)
@@ -297,7 +300,9 @@ mergeDT <- function(DT1 = NULL, DT2 = NULL, keys = NULL, keepCols = NULL,
 
 #' subsetDT()
 #'
-#' Merges two data.tables using 
+#' Subsets a data.table by either setting keys, or using keys that have already
+#' been set. This type of subset may be faster than using a subset expression
+#' in the i clause of a data.table statement without setting keys. 
 #' 
 #' @keywords subset, rows, DT, data.table
 #' @param data a data.table
@@ -313,9 +318,9 @@ mergeDT <- function(DT1 = NULL, DT2 = NULL, keys = NULL, keepCols = NULL,
 subsetDT <- function(data, ..., ref = TRUE) {
     
     # Error handling
-    assertthat::assert_that(notNULL(data))
-    assertthat::assert_that(is.DT(data))
-    assertthat::assert_that(is.flag(ref))
+    assert_that(notNULL(data))
+    assert_that(is.DT(data))
+    assert_that(is.flag(ref))
     
     # Create a subset object if one wasn't passed to ...
     obj <- subsetObj(...)

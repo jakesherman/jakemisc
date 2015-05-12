@@ -47,58 +47,6 @@ NSEtoVector <- function(..., USE.NAMES = FALSE) {
     return(package_names)
 }
 
-# Turn one or more NSE names (...) into a character vector, removing " marks
-NSEtoVector_ <- function(..., USE.NAMES = FALSE) {
-    
-    # Concatenate ... together via non-standard evaluation (NSE) so quotes do 
-    # not need to be placed elements of ...
-    vectors <- sapply(substitute(...()), deparse)
-    
-    # Function for taking quotes out of vectors
-    removeQuotes <- function(vectors, USE.NAMES = FALSE) {
-        
-        vectors <- sapply(vectors, function(f) {
-            if (f == "NA") f <- NA
-            if (f == "NaN") f <- NaN
-            if (f == "TRUE" & is.logical(f)) f <- TRUE
-            if (f == "FALSE" & is.logical(f)) f <- FALSE
-            if (grepl("\"", f)) f <- gsub("\"", "", f)
-            return(f)
-        }, USE.NAMES = USE.NAMES)
-        
-        return(vectors)
-    }
-    
-    # If length of ... is 1, evaluate any c() functions
-    if (length(vectors) == 1) {
-        
-        if (grepl("c\\(", vectors)) {
-            vectors <- eval(parse(text = vectors))
-            
-        } else if (vectors == "NULL") {
-            vectors <- NULL
-            
-        } else if (vectors == "NA") {
-            vectors <- NA
-            
-        } else if (vectors == "NaN") {
-            vectors <- NaN
-            
-        } else {
-            
-            # Remove escaped quotation marks
-            vectors <- removeQuotes(vectors, USE.NAMES = USE.NAMES)
-        }
-        
-    } else {
-     
-        # Remove escaped quotation marks
-        vectors <- removeQuotes(vectors, USE.NAMES = USE.NAMES)  
-    }
-    
-    return(vectors)
-}
-
 # Given a string a symbol, return the position of the symbol w/i the string
 getSymbolPosition <- function(string, symbol) {
     return(gregexpr(symbol, string)[[1]][1])
@@ -129,11 +77,52 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
 sumNAs <- function(f) sum(is.na(f))
 
 # dplyr like column selection
-columnsToUse <- function(allCols, markedCols) {
+columnsToOperateOn <- function(allCols, markedCols) {
+    
+    # Arguments: a character vector of all column names (allCols), and a 
+    #            character vector of "marked" column names (markedCols) where
+    #            some columns may be preceded w/ a "-" to indicate that we
+    #            want all columns but those ones
+    # Outputs: a character vector of columns from allCols (but decided by
+    #          markedCols to use)
     
     # Error handling
-    assertthat::assert_that(namesIn())
+    assertthat(all(markedCols %in% allCols))
     
+    # Does the first column contain a "-"? Return TRUE if so.
+    firstColMinus <- function(markedCols) {
+        firstCol <- FALSE
+        minusCols <- substr(markedCols, 1, 1) == "-"
+        if (minusCols[1]) firstCol <- TRUE
+        firstCol
+    }
+    
+    # Function for getting all minus columns in markedCols
+    minusCols <- function(markedCols) {
+        markedCols[substr(markedCols, 1, 1) == "-"]
+    }
+    
+    # Function for geting all non-minus columns in markedCols
+    nonMinusCols <- function(markedCols) {
+        markedCols[substr(markedCols, 1, 1) != "-"]
+    }
+    
+    # Get minusCols and markedCols
+    localMinusCols <- minusCols(markedCols)
+    localNonMinusCols <- nonMinusCols(markedCols)
+    
+    # Are there any duplicates in either of the above?
+    if (!is.null())
+    
+    # If any columns overlap between the two, throw an error
+    if (!is.null(localMinusCols) & !is.null(localNonMinusCols) &
+        any(localMinusCols %in% localNonMinusCols)) {
+        stop("You cannot specify columns as both minus and nonMinus")
+    }
+    
+    # If the first column in markedCols contains a "-", delete all columns in
+    # markedCols from allCols that contain a "-". Otherwise, keep all columns
+    # in markedCols that do not contain a "-".
     if (substr(markedCols[1], 1, 1) == "-") {
         # Delete these   
     } else {

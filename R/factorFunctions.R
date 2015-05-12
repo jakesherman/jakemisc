@@ -36,6 +36,7 @@ sampleUpTo <- function(x, size, prob = NULL) {
 #' @importFrom magrittr "%$%"
 #' @importFrom assertthat assert_that
 #' @importFrom assertthat is.flag
+#' @importFrom assertthat not_empty
 #' @export
 #' @examples
 #' 
