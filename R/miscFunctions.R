@@ -23,6 +23,33 @@ changeObjName <- function(oldObj, newObj) {
     rm(list = oldObjName, envir = sys.frame(-1))
 }
 
+listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
+    
+    # Arguments: a list, where each element is named
+    # Side effects: saves each element of the list as an object in the next up
+    #               environment with the name of the element of the list. Once
+    #               the objects are created, the list will be removed
+    
+    # Use NSE to get the name of the list
+    myListName <- deparse(substitute(myList))
+    
+    # Assign elements of the list to objects
+    for (i in seq_along(myList)) {
+        elementName <- names(myList)[i]
+        assign(elementName, myList[[i]], envir = sys.frame(-1))
+        if (verbose) message("Element: ", elementName, 
+                             " assigned to an object.")
+    }
+    
+    # Delete the list if deleteList == TRUE
+    if (deleteList) {
+        rm(list = myListName, envir = sys.frame(-1))
+        if (verbose) message("List: ", myListName, 
+                             " removed, all objects assigned.")
+    }
+}
+
+
 #' createDirIfNotExist()
 #'
 #' Creates a directory if it doesn't already exist.
