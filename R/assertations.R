@@ -43,3 +43,11 @@ assertthat::on_failure(namesIn) <- function(call, env = parent.env) {
     paste0("One or more of the names in '", deparse(call$x), "' is not a name",
            " in the data.frame")
 }
+
+## exists ---------------------------------------------------------------------
+
+exists <- function(...) base::exists(...)
+
+assertthat::on_failure(exists) <- function(call, env = parent.env) {
+    paste0("Object does not exist.")
+}

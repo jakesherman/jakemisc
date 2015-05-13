@@ -4,7 +4,22 @@
 ##
 ## ============================================================================
 
-changeObjName <- function(oldObj, newObj) {
+#' changeObjectName()
+#' 
+#' Change the name of an object. Uses non-standard evaluation (NSE) to capture
+#' the unevaluted expressions given for its arguments (this should become clear
+#' in the examples below.) See changeObjectName_ for a version of this function
+#' that doesn't use NSE
+#'
+#' @param oldObj the object that should have its name changed
+#' @param newObj the new name of the object
+#' @export
+#' @examples
+#' 
+#' jake <- c(5, 6, 7)
+#' changeObectName(jake, john)
+
+changeObjectName <- function(oldObj, newObj) {
     
     # Arguments: an object (oldObj), the name that you want to change oldObj 
     #            to (newObj)
@@ -15,12 +30,31 @@ changeObjName <- function(oldObj, newObj) {
     oldObjName <- deparse(substitute(oldObj))
     newObjName <- deparse(substitute(newObj))
     
+    # Error handling
+    assert_that(exists(oldObjName))
+    
     # Create an object w/ a name of newObj associated with the value of oldObj
-    changeNameExpression <- paste0(newObjName, " <<- ", oldObjName)
-    eval(parse(text = changeNameExpression))
+    assign(newObjName, oldObj, envir = sys.frame(-1))
     
     # Remove oldObj
     rm(list = oldObjName, envir = sys.frame(-1))
+}
+
+changeObjectName_ <- function(oldObj, newObj) {
+    
+    # Arguments: an object (oldObj), the name that you want to change oldObj 
+    #            to (newObj), all strings (no NSE)
+    # Side effects: Creates newObj, assigns it the value of oldObj, and then
+    #               removes oldObj
+    
+    # Error handling
+    
+    
+    # Create an object w/ a name of newObj associated with the value of oldObj
+    assign(newObj, get(oldObj, envir = sys.frame(-1)), envir = sys.frame(-1))
+    
+    # Remove oldObj
+    rm(list = oldObj, envir = sys.frame(-1))
 }
 
 listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
@@ -48,7 +82,6 @@ listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
                              " removed, all objects assigned.")
     }
 }
-
 
 #' createDirIfNotExist()
 #'
