@@ -51,3 +51,11 @@ exists <- function(...) base::exists(...)
 assertthat::on_failure(exists) <- function(call, env = parent.env) {
     paste0("Object does not exist.")
 }
+
+## notIdentical ---------------------------------------------------------------
+
+notIdentical <- function(x, y) !identical(x, y)
+
+assertthat::on_failure(notIdentical) <- function(call, env = parent.env) {
+    paste0("The objects you have provided are identical.")
+}

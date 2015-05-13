@@ -9,7 +9,7 @@
 #' Change the name of an object. Uses non-standard evaluation (NSE) to capture
 #' the unevaluted expressions given for its arguments (this should become clear
 #' in the examples below.) See changeObjectName_ for a version of this function
-#' that doesn't use NSE
+#' that doesn't use NSE.
 #'
 #' @param oldObj the object that should have its name changed
 #' @param newObj the new name of the object
@@ -17,14 +17,9 @@
 #' @examples
 #' 
 #' jake <- c(5, 6, 7)
-#' changeObectName(jake, john)
+#' changeObjectName(jake, john)
 
-changeObjectName <- function(oldObj, newObj) {
-    
-    # Arguments: an object (oldObj), the name that you want to change oldObj 
-    #            to (newObj)
-    # Side effects: Creates newObj, assigns it the value of oldObj, and then
-    #               removes oldObj
+changeObjectName <- function(oldObj, newObj, overwriteExisting = TRUE) {
     
     # Use NSE to get names of oldObj, newObj
     oldObjName <- deparse(substitute(oldObj))
@@ -32,6 +27,19 @@ changeObjectName <- function(oldObj, newObj) {
     
     # Error handling
     assert_that(exists(oldObjName))
+    assert_that(notIdentical(oldObjName, newObjName))
+    
+    # If an object named newObjName exists, throw a warning, but don't 
+    # overwrite it if overwriteExisting == FALSE
+    if (exists(newObjName)) {
+        if (overwriteExisting) {
+            warning("An object named: '", newObjName, 
+                    "' already exists and is being overwritten.")
+        } else {
+            stop("An object named: '", newObjName , 
+                 "' already exists, stopping the function.")
+        }
+    }
     
     # Create an object w/ a name of newObj associated with the value of oldObj
     assign(newObjName, oldObj, envir = sys.frame(-1))
@@ -40,15 +48,36 @@ changeObjectName <- function(oldObj, newObj) {
     rm(list = oldObjName, envir = sys.frame(-1))
 }
 
-changeObjectName_ <- function(oldObj, newObj) {
+#' changeObjectName_()
+#' 
+#' Change the name of an object. Uses standard evaluation (SE) to capture
+#' to change the name of an object given character vectors for the current
+#' name of an object and the desired name.
+#'
+#' @param oldObj the object that should have its name changed
+#' @param newObj the new name of the object
+#' @export
+#' @examples
+#' 
+#' jake <- c(5, 6, 7)
+#' changeObjectName("jake", "john")
+
+changeObjectName_ <- function(oldObj, newObj, overwriteExisting = TRUE) {
     
-    # Arguments: an object (oldObj), the name that you want to change oldObj 
-    #            to (newObj), all strings (no NSE)
-    # Side effects: Creates newObj, assigns it the value of oldObj, and then
-    #               removes oldObj
+    # Error handling 
+    assert_that(is.string(oldObj))
+    assert_that(is.string(newObj))
+    assert_that(is.flag(verbose))
     
-    # Error handling
-    
+    # If an object named newObj exists, throw a warning, but don't 
+    # overwrite it if overwriteExisting == FALSE
+    if (exists(newObj)) {
+        if (overwriteExisting) {
+            warning(newObj, " already exists and is being overwritten.")
+        } else {
+            stop(newObj ," already exists, stopping the function.")
+        }
+    }
     
     # Create an object w/ a name of newObj associated with the value of oldObj
     assign(newObj, get(oldObj, envir = sys.frame(-1)), envir = sys.frame(-1))
@@ -66,6 +95,11 @@ listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
     
     # Use NSE to get the name of the list
     myListName <- deparse(substitute(myList))
+    
+    # Error handling
+    assert_that(exists(myListName))
+    assert_that(is.flag(deleteList))
+    assert_that(is.flag(verbose))
     
     # Assign elements of the list to objects
     for (i in seq_along(myList)) {
