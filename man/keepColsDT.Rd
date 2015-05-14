@@ -4,14 +4,14 @@
 \alias{keepColsDT}
 \title{keepColsDT()}
 \usage{
-keepColsDT(data = NULL, keepCols = NULL, silent = FALSE)
+keepColsDT(data = NULL, keepCols = NULL, verbose = TRUE)
 }
 \arguments{
 \item{data}{a data.table}
 
 \item{keepCols}{a character vector of column names NOT to delete}
 
-\item{silent}{FALSE by default, if TRUE it turns off the messages that
+\item{verbose}{TRUE by default, if FALSE it turns off the messages that
 appear after each column is deleted by reference.}
 }
 \description{

@@ -19,7 +19,9 @@ a copy of data is made via \code{data.table::copy()}, leaving data
 unaffected by the key setting in subsetDT.}
 }
 \description{
-Merges two data.tables using
+Subsets a data.table by either setting keys, or using keys that have already
+been set. This type of subset may be faster than using a subset expression
+in the i clause of a data.table statement without setting keys.
 }
 \keyword{DT,}
 \keyword{data.table}

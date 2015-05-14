@@ -86,12 +86,25 @@ changeObjectName_ <- function(oldObj, newObj, overwriteExisting = TRUE) {
     rm(list = oldObj, envir = sys.frame(-1))
 }
 
-listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
-    
-    # Arguments: a list, where each element is named
-    # Side effects: saves each element of the list as an object in the next up
-    #               environment with the name of the element of the list. Once
-    #               the objects are created, the list will be removed
+#' listToObjects()
+#'
+#' Turns each element of a list into an object in your global environment with
+#' the name of each element in the list becoming the name of that object. By
+#' default, the list is deleted at the end, although this behavior may be 
+#' turned off. 
+#' 
+#' @keywords transform, list, into, objects
+#' @param myList a list
+#' @param deleteList TRUE by default, should the list be deleted after?
+#' @param verbose TRUE by default, should the function be verbose?
+#' @export
+#' @examples 
+#' 
+#' jake <- list(a = c(1, 2, 3), b = c(2, 3, 4))
+#' listToObjects(jake)
+
+listToObjects <- function(myList, deleteList = TRUE, objectNames = NULL,
+                          overwriteExisting = TRUE, verbose = TRUE) {
     
     # Use NSE to get the name of the list
     myListName <- deparse(substitute(myList))
@@ -100,19 +113,46 @@ listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
     assert_that(exists(myListName))
     assert_that(is.flag(deleteList))
     assert_that(is.flag(verbose))
+    if (!is.null(objectNames) & length(objectNames) != length(myList)) {
+        stop("The number of objectNames does not match the length of your ",
+             "list.")
+    }
     
-    # Assign elements of the list to objects
+    objectNamesExist <- !is.null(objectNames)
+    
+    ##  Assign elements of the list to objects
+    
     for (i in seq_along(myList)) {
-        elementName <- names(myList)[i]
+        
+        # Get the name for the object
+        if (objectNamesExist) {
+            elementName <- objectNames[i]  
+        } else {
+            elementName <- names(myList)[i]  
+        }
+        
+        # What to do if the object already exists?
+        if (exists(elementName)) {
+            if (overwriteExisting) {
+                if (verbose) message("The object named: '", elementName , "' ",
+                                     "already exists, stopping the function.")
+            } else {
+                stop("The object named: '", elementName ,"' already exists, ",
+                     "stopping the function.")
+            }
+        }
+        
+        # Create the object
         assign(elementName, myList[[i]], envir = sys.frame(-1))
         if (verbose) message("Element: ", elementName, 
                              " assigned to an object.")
     }
     
-    # Delete the list if deleteList == TRUE
+    ## Delete the list if deleteList == TRUE
+    
     if (deleteList) {
         rm(list = myListName, envir = sys.frame(-1))
-        if (verbose) message("List: ", myListName, 
+        if (verbose) message("\nList: ", myListName, 
                              " removed, all objects assigned.")
     }
 }
