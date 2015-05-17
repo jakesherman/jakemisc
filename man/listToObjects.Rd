@@ -12,6 +12,14 @@ listToObjects(myList, deleteList = TRUE, objectNames = NULL,
 
 \item{deleteList}{TRUE by default, should the list be deleted after?}
 
+\item{objectNames}{(optional) a vector of object names, one per element in
+myList. By default, the names of the objects will be the names of myList,
+which may be viewed via \code{names(myList)}}
+
+\item{overwriteExisting}{TRUE by default, should the function overwrite
+existing objects whose names are in \code{names(myList)} or the objectNames
+argument?}
+
 \item{verbose}{TRUE by default, should the function be verbose?}
 }
 \description{

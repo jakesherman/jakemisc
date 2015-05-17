@@ -13,6 +13,8 @@
 #'
 #' @param oldObj the object that should have its name changed
 #' @param newObj the new name of the object
+#' @param overwriteExisting TRUE by default, should the function overwrite
+#' existing objects with the name newObj?
 #' @export
 #' @examples
 #' 
@@ -56,6 +58,8 @@ changeObjectName <- function(oldObj, newObj, overwriteExisting = TRUE) {
 #'
 #' @param oldObj the object that should have its name changed
 #' @param newObj the new name of the object
+#' @param overwriteExisting TRUE by default, should the function overwrite
+#' existing objects with the name newObj?
 #' @export
 #' @examples
 #' 
@@ -96,6 +100,12 @@ changeObjectName_ <- function(oldObj, newObj, overwriteExisting = TRUE) {
 #' @keywords transform, list, into, objects
 #' @param myList a list
 #' @param deleteList TRUE by default, should the list be deleted after?
+#' @param objectNames (optional) a vector of object names, one per element in
+#' myList. By default, the names of the objects will be the names of myList,
+#' which may be viewed via \code{names(myList)}
+#' @param overwriteExisting TRUE by default, should the function overwrite
+#' existing objects whose names are in \code{names(myList)} or the objectNames
+#' argument?
 #' @param verbose TRUE by default, should the function be verbose?
 #' @export
 #' @examples 
@@ -173,4 +183,32 @@ createDirIfNotExist <- function(dir_location, ...) {
     } else {
         message(dir_location, " already exists.")
     }
+}
+
+#' splitRmNA()
+#'
+#' Splits one vector by another vector after removing elements from both
+#' vectors when either vector is NA. 
+#' 
+#' @keywords split, vector, remove, NA, NAs
+#' @param vector1
+#' @param vector2
+#' @param ... additional arguments to be passed to \code{base::split}
+#' @export
+
+splitRmNA <- function(vector1, vector2, ...) {
+    
+    # Arguments: two vectors
+    # Outputs: a list created using base:split(vector1, vector2), but with 
+    #          NAs removed by calling complete.cases on both vectors
+    
+    # Error handling 
+    assert_that(isVector(vector1))
+    assert_that(isVector(vector2))
+    
+    # Split the vectors
+    subsetBy <- complete.cases(vector1, vector2)
+    vector1 <- vector1[subsetBy]
+    vector2 <- vector2[subsetBy]
+    split(vector1, vector2, ...)
 }

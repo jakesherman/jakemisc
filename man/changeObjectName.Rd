@@ -10,6 +10,9 @@ changeObjectName(oldObj, newObj, overwriteExisting = TRUE)
 \item{oldObj}{the object that should have its name changed}
 
 \item{newObj}{the new name of the object}
+
+\item{overwriteExisting}{TRUE by default, should the function overwrite
+existing objects with the name newObj?}
 }
 \description{
 Change the name of an object. Uses non-standard evaluation (NSE) to capture
