@@ -175,6 +175,8 @@ listToObjects <- function(myList, deleteList = TRUE, objectNames = NULL,
 #' @param dir_location the directory you want to create
 #' @param ... additional arguments to be passed to dir.create
 #' @export
+#' 
+#' createDirIfNotExist("C:/Users/Jake/Programming/NewFolder")
 
 createDirIfNotExist <- function(dir_location, ...) {
     
@@ -195,12 +197,10 @@ createDirIfNotExist <- function(dir_location, ...) {
 #' @param vector2
 #' @param ... additional arguments to be passed to \code{base::split}
 #' @export
+#' 
+#' splitRmNA(vector1, vector2)
 
 splitRmNA <- function(vector1, vector2, ...) {
-    
-    # Arguments: two vectors
-    # Outputs: a list created using base:split(vector1, vector2), but with 
-    #          NAs removed by calling complete.cases on both vectors
     
     # Error handling 
     assert_that(isVector(vector1))

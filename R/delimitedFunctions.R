@@ -28,7 +28,7 @@
 #' @export
 #' @examples
 #' 
-#' \code{delimited <- longToDelimited(myData, "soccerPlayers", "team")}
+#' delimited <- longToDelimited(myData, "soccerPlayers", "team")
 
 longToDelimited <- function(data, delimitThis, byThis, delimiter = ", ",
                             filter = NULL, returnDT = NULL,
