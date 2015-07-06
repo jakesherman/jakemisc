@@ -28,8 +28,8 @@
 #' Here is how to change a column name, where we change a column named "Jake"
 #' into one named "Josh":
 #' 
-#' \code{changeColName(my_data, "Jake", "Josh")}
-#' \code{changeColName(my_data, Jake/Josh, ref = FALSE, warnings = FALSE)}
+#' changeColName(my_data, "Jake", "Josh")
+#' changeColName(my_data, Jake/Josh, ref = FALSE, warnings = FALSE)
 
 changeColName <- function(data, ..., ref = TRUE, warnings = TRUE) {
     changeColName_(data, NSEtoVector(...), ref = ref, warnings = warnings)

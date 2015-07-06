@@ -25,10 +25,10 @@
 #' 
 #' To see the number of NAs either in total or by column, depending on the 
 #' class of the object inputted:
-#' \code{NAs(my_data)}
+#' NAs(my_data)
 #' 
 #' Same as above, but now looking at the percent of NAs:
-#' \code{NAs(my_data, type = "percent")}
+#' NAs(my_data, type = "percent")
  
 NAs <- function(data, type, digits) {
     UseMethod("NAs")
@@ -112,10 +112,10 @@ NAs.default <- function(data, type = "number", digits = 2) {
 #' 
 #' To see the number of NaNs either in total or by column, depending on the 
 #' class of the object inputted:
-#' \code{NaNs(my_data)}
+#' NaNs(my_data)
 #' 
 #' Same as above, but now looking at the percent of NAs:
-#' \code{NaNs(my_data, type = "percent")}
+#' NaNs(my_data, type = "percent")
 
 NaNs <- function(data, type, digits) {
     UseMethod("NaNs")
@@ -198,10 +198,10 @@ NaNs.default <- function(data, type = "number", digits = 2) {
 #' 
 #' To see the number of Non-NAs either in total or by column, depending on the 
 #' class of the object inputted:
-#' \code{NonNAs(my_data)}
+#' NonNAs(my_data)
 #' 
 #' Same as above, but now looking at the percent of Non_NAs:
-#' \code{NonNAs(my_data, type = "percent")}
+#' NonNAs(my_data, type = "percent")
 
 NonNAs <- function(data, type, digits) {
     UseMethod("NonNAs")

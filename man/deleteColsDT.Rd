@@ -4,14 +4,14 @@
 \alias{deleteColsDT}
 \title{deleteColsDT()}
 \usage{
-deleteColsDT(data = NULL, deleteCols = NULL, silent = FALSE)
+deleteColsDT(data = NULL, deleteCols = NULL, verbose = TRUE)
 }
 \arguments{
 \item{data}{a data.table}
 
 \item{deleteCols}{a character vector of column names o delete}
 
-\item{silent}{FALSE by default, if TRUE it turns off the messages that
+\item{verbose}{TRUE by default, if FALSE it turns off the messages that
 appear after each column is deleted by reference.}
 }
 \description{

@@ -87,21 +87,21 @@ matchup <- function(require_matches, matching_data, match_this, to_this) {
 #' initials to state names, like the example for the matchup() function. 
 #' Remember, this is how we matched state initials to names before:
 #' 
-#' \code{matchup(vector_of_state_initials, us_states, "state", "state_name")}
+#' matchup(vector_of_state_initials, us_states, "state", "state_name")
 #' 
 #' Now let's create a function to do this, called initials_to_names():
 #' 
-#' \code{initals_to_names <- createMatchup(us_states, "state", "state_name")}
+#' initals_to_names <- createMatchup(us_states, "state", "state_name")
 #' 
 #' Now, we just need to input the vector_of_state_initials that was the first
 #' argument in the matchup() function above to produce its output when it comes
 #' to matching state names to initials. This:
 #' 
-#' \code{initials_to_names(vector_of_state_initials)}
+#' initials_to_names(vector_of_state_initials)
 #' 
 #' Produces the same output as this:
 #' 
-#' \code{matchup(vector_of_state_initials, us_states, "state", "state_name")}
+#' matchup(vector_of_state_initials, us_states, "state", "state_name")
 
 createMatchup <- function(matching_data, match_this, to_this) {
     
@@ -115,9 +115,9 @@ createMatchup <- function(matching_data, match_this, to_this) {
     function(require_matches) {
         
         # Error handling (child)
-        if(is.null(require_matches)) stop("Please enter the a vector of",
-                                          " elements that need to be",
-                                          " matched.")
+        if (is.null(require_matches)) stop("Please enter the a vector of",
+                                           " elements that need to be",
+                                           " matched.")
         
         # Use the supplied column names to subset the supplied data frame to 
         # generate vectors

@@ -13,6 +13,8 @@
 #'
 #' @param oldObj the object that should have its name changed
 #' @param newObj the new name of the object
+#' @param overwriteExisting TRUE by default, should the function overwrite
+#' existing objects with the name newObj?
 #' @export
 #' @examples
 #' 
@@ -56,6 +58,8 @@ changeObjectName <- function(oldObj, newObj, overwriteExisting = TRUE) {
 #'
 #' @param oldObj the object that should have its name changed
 #' @param newObj the new name of the object
+#' @param overwriteExisting TRUE by default, should the function overwrite
+#' existing objects with the name newObj?
 #' @export
 #' @examples
 #' 
@@ -86,12 +90,31 @@ changeObjectName_ <- function(oldObj, newObj, overwriteExisting = TRUE) {
     rm(list = oldObj, envir = sys.frame(-1))
 }
 
-listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
-    
-    # Arguments: a list, where each element is named
-    # Side effects: saves each element of the list as an object in the next up
-    #               environment with the name of the element of the list. Once
-    #               the objects are created, the list will be removed
+#' listToObjects()
+#'
+#' Turns each element of a list into an object in your global environment with
+#' the name of each element in the list becoming the name of that object. By
+#' default, the list is deleted at the end, although this behavior may be 
+#' turned off. 
+#' 
+#' @keywords transform, list, into, objects
+#' @param myList a list
+#' @param deleteList TRUE by default, should the list be deleted after?
+#' @param objectNames (optional) a vector of object names, one per element in
+#' myList. By default, the names of the objects will be the names of myList,
+#' which may be viewed via \code{names(myList)}
+#' @param overwriteExisting TRUE by default, should the function overwrite
+#' existing objects whose names are in \code{names(myList)} or the objectNames
+#' argument?
+#' @param verbose TRUE by default, should the function be verbose?
+#' @export
+#' @examples 
+#' 
+#' jake <- list(a = c(1, 2, 3), b = c(2, 3, 4))
+#' listToObjects(jake)
+
+listToObjects <- function(myList, deleteList = TRUE, objectNames = NULL,
+                          overwriteExisting = TRUE, verbose = TRUE) {
     
     # Use NSE to get the name of the list
     myListName <- deparse(substitute(myList))
@@ -100,19 +123,46 @@ listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
     assert_that(exists(myListName))
     assert_that(is.flag(deleteList))
     assert_that(is.flag(verbose))
+    if (!is.null(objectNames) & length(objectNames) != length(myList)) {
+        stop("The number of objectNames does not match the length of your ",
+             "list.")
+    }
     
-    # Assign elements of the list to objects
+    objectNamesExist <- !is.null(objectNames)
+    
+    ##  Assign elements of the list to objects
+    
     for (i in seq_along(myList)) {
-        elementName <- names(myList)[i]
+        
+        # Get the name for the object
+        if (objectNamesExist) {
+            elementName <- objectNames[i]  
+        } else {
+            elementName <- names(myList)[i]  
+        }
+        
+        # What to do if the object already exists?
+        if (exists(elementName)) {
+            if (overwriteExisting) {
+                if (verbose) message("The object named: '", elementName , "' ",
+                                     "already exists, stopping the function.")
+            } else {
+                stop("The object named: '", elementName ,"' already exists, ",
+                     "stopping the function.")
+            }
+        }
+        
+        # Create the object
         assign(elementName, myList[[i]], envir = sys.frame(-1))
         if (verbose) message("Element: ", elementName, 
                              " assigned to an object.")
     }
     
-    # Delete the list if deleteList == TRUE
+    ## Delete the list if deleteList == TRUE
+    
     if (deleteList) {
         rm(list = myListName, envir = sys.frame(-1))
-        if (verbose) message("List: ", myListName, 
+        if (verbose) message("\nList: ", myListName, 
                              " removed, all objects assigned.")
     }
 }
@@ -125,6 +175,8 @@ listToObjects <- function(myList, deleteList = TRUE, verbose = TRUE) {
 #' @param dir_location the directory you want to create
 #' @param ... additional arguments to be passed to dir.create
 #' @export
+#' 
+#' createDirIfNotExist("C:/Users/Jake/Programming/NewFolder")
 
 createDirIfNotExist <- function(dir_location, ...) {
     
@@ -133,4 +185,30 @@ createDirIfNotExist <- function(dir_location, ...) {
     } else {
         message(dir_location, " already exists.")
     }
+}
+
+#' splitRmNA()
+#'
+#' Splits one vector by another vector after removing elements from both
+#' vectors when either vector is NA. 
+#' 
+#' @keywords split, vector, remove, NA, NAs
+#' @param vector1
+#' @param vector2
+#' @param ... additional arguments to be passed to \code{base::split}
+#' @export
+#' 
+#' splitRmNA(vector1, vector2)
+
+splitRmNA <- function(vector1, vector2, ...) {
+    
+    # Error handling 
+    assert_that(isVector(vector1))
+    assert_that(isVector(vector2))
+    
+    # Split the vectors
+    subsetBy <- complete.cases(vector1, vector2)
+    vector1 <- vector1[subsetBy]
+    vector2 <- vector2[subsetBy]
+    split(vector1, vector2, ...)
 }

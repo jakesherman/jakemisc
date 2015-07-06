@@ -30,11 +30,9 @@
 #' @export
 #' @examples
 #' 
-#' \code{changeColClass(my_data, "factor", "character")}
-#' \code{changeColClass(my_data, "numeric", "character", 
-#'                      onlyConvert = c(my_cols))}
-#' \code{changeColClass(my_data, "numeric", "character", 
-#'                      noConvert = "special_col")}
+#' changeColClass(my_data, "factor", "character")
+#' changeColClass(my_data, "numeric", "character", onlyConvert = c(my_cols))
+#' changeColClass(my_data, "numeric", "character", noConvert = "special_col")
 
 changeColClass <- function(data = NULL, startingClass = NULL, finalClass = NULL,
                            onlyConvert = NULL, noConvert = NULL, ref = TRUE) {

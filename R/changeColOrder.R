@@ -27,7 +27,7 @@
 #' Here is how to change a column name, where we change a column named "Jake"
 #' into one named "Josh":
 #' 
-#' \code{changeColOrder(my_data, "Jake", "Josh")}
+#' changeColOrder(my_data, "Jake", "Josh")
 
 changeColOrder <- function(data, ..., ref = TRUE, warnings = TRUE) {
     

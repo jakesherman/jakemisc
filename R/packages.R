@@ -32,35 +32,35 @@
 #' @export
 #' @examples
 #' 
-#' First, lets try replicating library(pryr) with \code{packages()}:
+#' First, lets try replicating library(pryr) with packages():
 #' 
-#' \code{packages(pryr)}
+#' packages(pryr)
 #' 
 #' The packages() function takes multiple package names, and may be used to 
 #' load/install multiple packages, for example:
 #' 
-#' \code{packages(pryr, data.table)}
+#' packages(pryr, data.table)
 #' 
 #' In addition to packages from CRAN, you can install packages from public repos
 #' on Github or Bitbucket. To install a Github package, in a string type the
 #' GitHub username, followed by a /, followed by the repo name, like so:
 #' 
-#' \code{packages("jakesherman/jakemisc")}
+#' packages("jakesherman/jakemisc")
 #' 
 #' For Bitbucket packages, use the "$" symbol:
 #' 
-#' \code{packages(jakesherman$jakemisc)}
+#' packages(jakesherman$jakemisc)
 #' 
 #' Mixing CRAN and Github packages:
 #' 
-#' \code{packages(pryr, data.table, "RODBC", "jakesherman/jakemisc")}
+#' packages(pryr, data.table, "RODBC", "jakesherman/jakemisc")
 #' 
 #' You may also add a double colon after a package name to indicate that you
 #' want the package to be installed, but you do not want to explicitly attach
 #' the package. The idea here is that you are going to load the package when
 #' you use :: to call a function from a package. See an example:
 #' 
-#' \code{packages(plyr, "dplyr::")}
+#' packages(plyr, "dplyr::")
 #' 
 #' Note that this function uses non-standard evaluation for the package names,
 #' meaning that you dont need to put quotes around the names of your packages.
@@ -68,15 +68,15 @@
 #' exception is that any package name with a double colon, ::, needs to be in
 #' quotes:
 #' 
-#' \code{packages("pryr", data.table, "RODBC::", jakesherman/jakemisc)}
-#' \code{packages(pryr, "data.table::", "RODBC::", jakesherman/jakemisc)}
+#' packages("pryr", data.table, "RODBC::", jakesherman/jakemisc)
+#' packages(pryr, "data.table::", "RODBC::", jakesherman/jakemisc)
 #' 
 #' You may also specify the GitHub branch to install a GitHub package from, the
 #' default of course being the master branch. Please note that this function 
 #' cannot tell whether or not a currently installed package is the package
 #' version of a particular GitHub branch.
 #' 
-#' \code{packages(jakesherman/jakemisc@@development)}
+#' packages(jakesherman/jakemisc@@development)
 #' 
 
 packages <- function(..., install = TRUE, results = FALSE, 

@@ -33,16 +33,15 @@
 #' 
 #' Lets say we want to convert "na" or -500 values into NAs for only the
 #' columns "town" and "city" in the data.table my_data:
-#' \code{valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))}
+#' valuesToNA(my_data, c("na", -500), onlyConvert = c("town", "city"))
 #' 
 #' Here is the same as above, but for a data.frame my_data:
-#' \code{my_data <- valuesToNA(my_data, c("na", -500), 
-#' onlyConvert = c("town", "city"))}
+#' my_data <- valuesToNA(my_data, c("na", -500), onlyConvert = c("town", 
+#'                       "city"))
 #' 
 #' Or, what if we want to convert "na" or -500 values into NAs for every
 #' columnn in my_data except for "town", "city", or "country":
-#' \code{valuesToNA(my_data, c("na", -500), noConvert = 
-#' c("town", "city", "country"))}
+#' valuesToNA(my_data, c("na", -500), noConvert = c("town", "city", "country"))
 
 valuesToNA <- function(data = NULL, values = NULL, onlyConvert = NULL, 
                        noConvert = NULL, ref = TRUE) {

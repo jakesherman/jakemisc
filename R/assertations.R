@@ -59,3 +59,16 @@ notIdentical <- function(x, y) !identical(x, y)
 assertthat::on_failure(notIdentical) <- function(call, env = parent.env) {
     paste0("The objects you have provided are identical.")
 }
+
+## isVector -------------------------------------------------------------------
+
+isVector <- function(x) {
+    
+    # https://stackoverflow.com/questions/19501186/how-to-test-if-object-
+    # is-a-vector
+    mode(x) %in% c("logical", "numeric", "complex", "character")
+}
+
+assertthat::on_failure(isVector) <- function(call, env) {
+    paste0("Argument '", deparse(call$x), "' is not a vector.")
+}
