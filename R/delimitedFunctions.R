@@ -165,7 +165,7 @@ delimitedToLong <- function(data, longThis, byThis, delimiter = ", ",
     
     # If arguments are missing
     if (is.null(data)) stop("Requires argument for data")
-    if (is.null(delimitThis)) stop("Requires argument for delimitThis")
+    if (is.null(longThis)) stop("Requires argument for longThis")
     if (is.null(byThis)) stop("Requires argument for byThis")
     
     # If data isn't a data.frame, get outta here
