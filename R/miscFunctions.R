@@ -212,3 +212,24 @@ splitRmNA <- function(vector1, vector2, ...) {
     vector2 <- vector2[subsetBy]
     split(vector1, vector2, ...)
 }
+
+# Ensures the column classes of a data.table, this is a work-in-progress, 
+# this version will become the data.table method, but I also need to create
+# a data.frame method
+ensureClass <- function(data, classes) {
+    
+    # Error handling
+    stopifnot(length(data) == length(classes))
+    stopifnot(inherits(data, "data.table"))
+    
+    # Loop over the columns of data
+    for (i in seq_along(data)) {
+        if (class(data[[i]]) != classes[i]) { 
+            old_class <- class(data[[i]])
+            conversion_func <- match.fun(paste0("as.", classes[i]))
+            set(data, j = names(data)[i], value = conversion_func(data[[i]]))
+            message("Column ", names(data)[i], " converted from ", old_class, 
+                    " to ", classes[i], " by reference.")
+        }
+    }
+}
