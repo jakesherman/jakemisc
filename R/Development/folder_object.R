@@ -50,32 +50,36 @@ folder <- function(root, ..., checkSubdirs = FALSE, defaultNames = TRUE,
     names(mylist)[1] <- "root"
     
     # Are all of the elements of mylist of length 1?
-    if (any(vapply(mylist, function(f) length(f) != 1, logical(1)))) {
+    if (any(vapply(mylist, function(f) length(f) != 1, logical(1)))) 
         stop("The length of each element of a folder object must be one.")
-    }
     
-    # Do the subdirs exist (only if checkSubdirs is TRUE)?
-    if (checkSubdirs & any(vapply(mylist[2:length(mylist)], function(f) {
-        !dir.exists(combineRootSubDirs(mylist[[1]], f))
-    }, logical(1)))) {
-        stop("One or more of the subDirs does not exist.")
-    }
-    
-    # Assign names to the elements of mylist depending on the defaultNames
-    # and dirNames arguments
-    if (!is.null(dirNames)) {
-        names(mylist)[2:length(mylist)] <- dirNames
-    } else if (defaultNames) {
-        names(mylist) <- unlist(Map(function(name, dir) {
-            if (name == "") name <- basename(dir)
-            name
-        }, names(mylist), mylist, USE.NAMES = FALSE))
-    }
-    
-    # If there are any repeat names, stop the function
-    if (any(duplicated(names(mylist)))) {
-        stop("One or more folder names (but not necessarily locations) are ",
-             "duplicates. Please correct this, or turn defaultNames to FALSE")
+    # Assuming that more than just the root directory was inputted, run the
+    # following:
+    if (length(mylist) > 1) {
+        
+        # Do the subdirs exist (only if checkSubdirs is TRUE)?
+        if (checkSubdirs & any(vapply(mylist[2:length(mylist)], function(f) {
+            !dir.exists(combineRootSubDirs(mylist[[1]], f))
+        }, logical(1)))) {
+            stop("One or more of the subDirs does not exist.")
+        }
+        
+        # Assign names to the elements of mylist depending on the defaultNames
+        # and dirNames arguments
+        if (!is.null(dirNames)) {
+            names(mylist)[2:length(mylist)] <- dirNames
+        } else if (defaultNames) {
+            names(mylist) <- unlist(Map(function(name, dir) {
+                if (is.na(name)) name <- basename(dir)
+                name
+            }, names(mylist), mylist, USE.NAMES = FALSE))
+        }
+        
+        # If there are any repeat names, stop the function
+        if (any(duplicated(names(mylist)))) {
+            stop("One or more folder names (but not necessarily locations) are ",
+                 "duplicates. Please correct this, or turn defaultNames to FALSE")
+        }
     }
     
     # Return the object of class 'folder'
@@ -156,7 +160,12 @@ createFolderPaths <- function(x) {
     
     # `$` method for the folder class
     x <- createFolderPaths(x)
-    `[[`(x, i, exact = FALSE)
+    structure(`[[`(x, i, exact = FALSE), class = c("folderstring", 
+                                                   "character"))
+}
+
+`+.folderstring` <- function(e1, e2) {
+    paste0(e1, e2)
 }
 
 # root function to return the root directory of a folder object
@@ -177,7 +186,12 @@ subDir <- function(folder, subDir) {
 }
 
 subDir.folder <- function(folder, subDir) {
+    
+    # Error handling
     assertthat::assert_that(length(subDir) == 1)
+    assertthat::assert_that(length(folder) > 1)
+    
+    # Return the subDir
     if (is.numeric(subDir)) subDir <- subDir + 1
     folder[[subDir]]
 }
