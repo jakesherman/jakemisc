@@ -4,7 +4,7 @@
 ##
 ## ============================================================================
 
-loadOrRun <- function(file, func, ..., ) {
+loadOrRun <- function(file, func, ...) {
     if (file.exists(file)) {
         
     }
