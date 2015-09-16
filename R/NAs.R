@@ -7,6 +7,13 @@
 ##
 ## ============================================================================
 
+## Not for export -------------------------------------------------------------
+
+# Function for summing NAs
+sumNAs <- function(f) sum(is.na(f))
+
+## For export -----------------------------------------------------------------
+
 #' NAs()
 #'
 #' Returns the number of NAs in an object by column (for data.frames and 

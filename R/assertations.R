@@ -72,3 +72,24 @@ isVector <- function(x) {
 assertthat::on_failure(isVector) <- function(call, env) {
     paste0("Argument '", deparse(call$x), "' is not a vector.")
 }
+
+## isVector -------------------------------------------------------------------
+
+is_vector <- function(x) {
+    
+    # https://stackoverflow.com/questions/19501186/how-to-test-if-object-
+    # is-a-vector
+    mode(x) %in% c("logical", "numeric", "complex", "character")
+}
+
+assertthat::on_failure(is_vector) <- function(call, env) {
+    paste0("Argument '", deparse(call$x), "' is not a vector.")
+}
+
+## no_duplicates ----------------------------------------------------------------
+
+no_duplicates <- function(x) sum(duplicated(x)) == 0
+
+assertthat::on_failure(no_duplicates) <- function(call, env)
+    paste0("Duplicates exist in ", deparse(call$x), " when they should be none.")
+

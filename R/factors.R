@@ -11,7 +11,7 @@
 
 ## Functions not for export ---------------------------------------------------
 
-sampleUpTo <- function(x, size, prob = NULL) {
+sample_up_to <- function(x, size, prob = NULL) {
     
     # Arguments: a vector (x), sample size (size), and a vector of probability
     #            weights from base::sample (prob)
@@ -23,61 +23,52 @@ sampleUpTo <- function(x, size, prob = NULL) {
 }
 
 # Detect if a numeric object is a whole number or not
-is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
+is_wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
     abs(x - round(x)) < tol
 }
 
 ## Functions for export -------------------------------------------------------
 
-#' factorToNumeric()
+#' factor_to_numeric()
 #'
 #' Turns factors into numerics. 
 #' 
 #' @keywords factor, numeric
 #' @param factors factors to convert to numeric
-#' @importFrom magrittr "%>%"
-#' @importFrom magrittr "%<>%"
-#' @importFrom magrittr "%T>%"
-#' @importFrom magrittr "%$%"
-#' @importFrom assertthat assert_that
-#' @importFrom assertthat is.flag
-#' @importFrom assertthat not_empty
 #' @export
 #' @examples
 #' 
 #' factors <- factor(c(1.2, 4.2, 4.2, 3.4))
-#' factors <- factorToNumeric(factors)
+#' factors <- factor_to_numeric(factors)
 
-factorToNumeric <- function(factors) {
+factor_to_numeric <- function(factors) {
     
     # Error handling
-    assert_that(notNULL(factors))
     assert_that(is.factor(factors))
     
     # Do the conversion
     as.numeric(as.character(factors))
 }
 
-#' factorToInteger()
+#' factor_to_integer()
 #'
 #' Turns factors into numerics. 
 #' 
 #' @keywords factor, numeric
 #' @param factors a vector of factors
 #' @param intCheck samples elements from factors to determine whether or not
-#' they are whole numbers. If they are not whole numbers, factorToNumeric is
+#' they are whole numbers. If they are not whole numbers, factor_to_numeric is
 #' used instead and a warning shows up. Default is \code{TRUE}, set this 
 #' argument to \code{FALSE} to disable this behavior. 
 #' @export
 #' @examples
 #' 
 #' factors <- factor(c(1,2,3,4,5))
-#' factors <- factorToInteger(factors)
+#' factors <- factor_to_integer(factors)
 
-factorToInteger <- function(factors = NULL, intCheck = TRUE) {
+factor_to_integer <- function(factors = NULL, intCheck = TRUE) {
     
     # Error handling
-    assert_that(notNULL(factors))
     assert_that(is.factor(factors))
     assert_that(is.flag(intCheck))
     
@@ -87,12 +78,12 @@ factorToInteger <- function(factors = NULL, intCheck = TRUE) {
         # Randomly sample up to 50 non-NA numbers from factors and convert
         # them to numerics
         nonNAfactors <- na.omit(factors)
-        sampledFactors <- sampleUpTo(nonNAfactors, 50) %>%
-            factorToNumeric()
+        sampledFactors <- sample_up_to(nonNAfactors, 50) %>%
+            factor_to_numeric()
         
         # If any of the sampledFactors are not whole numbers, use 
-        # factorToNumeric instead and throw a warning
-        if (any(!is.wholenumber(sampledFactors))) {
+        # factor_to_numeric instead and throw a warning
+        if (any(!is_wholenumber(sampledFactors))) {
             warning("One or more of the factors you presented are not whole",
                     " numbers, and thus could not be converted into integers.",
                     " Your factors were converted into doubles instead. ",

@@ -1,15 +1,46 @@
-## =============================================================================
+## ============================================================================
 ##
-## Internal functions to the jakemisc package. These functions are not exported,
-## therefore if you are trying to use one you need to use the ::: operator. 
+## Internal functions to the jakemisc package. These functions are not exported
+## , therefore if you are trying to use one you need to use the ::: operator. 
 ## Functions from within the package can access these internal functions via 
 ## the package's namespace. 
 ##
-## =============================================================================
+## ============================================================================
+
+# Save typing by importing functions from other packages::
+##
+#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%<>%"
+#' @importFrom magrittr "%T>%"
+#' @importFrom magrittr "%$%"
+#' @importFrom assertthat assert_that
+#' @importFrom assertthat is.flag
+#' @importFrom assertthat not_empty
 
 # compatibility for data.table functions
 # (see: https://github.com/hadley/dplyr/issues/548)
 .datatable.aware <- TRUE
+
+# Return TRUE if all ... have the same length
+equal_length <- function(...) {
+    objects <- list(...)
+    objects_range <- range(vapply(objects, length, numeric(1)))
+    objects_range[1] == objects_range[[2]]
+}
+
+named_list <- function(...) {
+    
+    # Returns a list of objects in ... but uses NSE to name each element of 
+    # the list as the name of that object
+    list_names <- sapply(substitute(...()), deparse)
+    named_list <- list(...)
+    names(named_list) <- list_names
+    
+    named_list
+}
+
+# Fast version of the %in% operator
+`%fin%` <- function(x, table) fastmatch::fmatch(x, table, nomatch = 0L) > 0L
 
 # Function for getting a numerical vector of the positions of a pattern
 # within a string (using regex, from the grepexpr function)
@@ -66,68 +97,4 @@ subsetColOrder <- function(data, subset_cols) {
     subset_order <- sapply(subset_cols, grep, colnames(data), 
                            USE.NAMES = FALSE)
     return(order(subset_order))
-}
-
-# Detect if a numeric object is a whole number or not
-is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
-    abs(x - round(x)) < tol
-}
-
-# Function for summing NAs
-sumNAs <- function(f) sum(is.na(f))
-
-# dplyr like column selection
-columnsToOperateOn <- function(allCols, markedCols) {
-    
-    # Arguments: a character vector of all column names (allCols), and a 
-    #            character vector of "marked" column names (markedCols) where
-    #            some columns may be preceded w/ a "-" to indicate that we
-    #            want all columns but those ones
-    # Outputs: a character vector of columns from allCols (but decided by
-    #          markedCols to use)
-    
-    # Error handling
-    assertthat(all(markedCols %in% allCols))
-    
-    # Does the first column contain a "-"? Return TRUE if so.
-    firstColMinus <- function(markedCols) {
-        firstCol <- FALSE
-        minusCols <- substr(markedCols, 1, 1) == "-"
-        if (minusCols[1]) firstCol <- TRUE
-        firstCol
-    }
-    
-    # Function for getting all minus columns in markedCols
-    minusCols <- function(markedCols) {
-        markedCols[substr(markedCols, 1, 1) == "-"]
-    }
-    
-    # Function for geting all non-minus columns in markedCols
-    nonMinusCols <- function(markedCols) {
-        markedCols[substr(markedCols, 1, 1) != "-"]
-    }
-    
-    # Get minusCols and markedCols
-    localMinusCols <- minusCols(markedCols)
-    localNonMinusCols <- nonMinusCols(markedCols)
-    
-    # Are there any duplicates in either of the above?
-    if (!is.null())
-    
-    # If any columns overlap between the two, throw an error
-    if (!is.null(localMinusCols) & !is.null(localNonMinusCols) &
-        any(localMinusCols %in% localNonMinusCols)) {
-        stop("You cannot specify columns as both minus and nonMinus")
-    }
-    
-    # If the first column in markedCols contains a "-", delete all columns in
-    # markedCols from allCols that contain a "-". Otherwise, keep all columns
-    # in markedCols that do not contain a "-".
-    if (substr(markedCols[1], 1, 1) == "-") {
-        # Delete these   
-    } else {
-        # Keep these
-    }
-    
-    # Have vector of columns to use
 }
