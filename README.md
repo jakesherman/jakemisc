@@ -1,6 +1,8 @@
 ## jakemisc
 
-The personal R package of Jake Sherman. Contained are misc functions and data that I have created/collected that I hope others may find useful.
+The personal R package of Jake Sherman. Contained are misc functions and data that I have created/collected that I hope others may find useful. 
+
+Note that as of December 2015 I am no longer maintaining this package. I have decided that any functions that are useful beyond myself will be split off into separate packages or micropackages (see my [packages](https://github.com/jakesherman/packages) package as an example). The conventional wisdom in the R community is that it is better to have many small packages that each do one thing well than to have one big package that tries to do many things. I will do my best to honor this. I am not going to take down this repo as some of the functions here still may be of some use. Looking back through this package it's fun to see how far my R skills have come since I started!
 
 ## Installation
 
@@ -9,17 +11,6 @@ This package is under development, and therefore is not yet on CRAN. It is easy 
 ```
 devtools::install_github("jakesherman/jakemisc")
 ```
-
-## Functions contained
-
-- `changeColClass`: given a data.frame or data.table, changes the class of each column of a given type to another given type. 
-- `changeColName`: Changes the name if a given column in a data.frame or data.table.
-- `createMatchup`: creates a closure filling the last three arguments of the `matchup` function, allowing one to create quick look-up functions. 
-- `factorToNumeric`: really simple, just converts factors into numerics. 
-- `matchup`: a quick way to match two variables with a 1:1 relationship, in the same way that VLOOKUP or INDEX/MATCH from Excel allow for matches between variables with a 1:1 relationship.
-- `packages`: installs or loads and then installs one or more R packages from CRAN, Github, or Bitbucket. Users have the option of not installing packages that one does not have, or being prompted to install packages via pacakges' arguments.
-- `valuesToNA`: given a data.frame or data.table, converts one or more values into NAs. Allows you to specify specific columns for conversion to take place over.
-- `valuesToValue`: given a data.frame or data.table, converts one or more values into a different value. Allows you to specify specific columns for conversion to take place over. 
 
 ## Acknowledgements
 
